@@ -5,6 +5,8 @@
 class GCT_Blog_Posts_Module extends ET_Builder_Module {
     public $slug = 'gct_blog_posts';
     public $vb_support = 'on';
+    public $child_slug = '';
+    public $name = 'Blog Posts Grid';
     
     protected $module_credits = array(
         'module_uri' => '',
@@ -16,7 +18,6 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
      * Module initialization
      */
     public function init() {
-        $this->name = esc_html__('Blog Posts Grid', 'gct-blog-posts-module');
         $this->icon = 'j';
         $this->main_css_element = '%%order_class%%.gct_blog_posts';
         
@@ -339,7 +340,7 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
     /**
      * Module render method
      */
-    public function render($attrs, $content, $render_slug) {
+    public function render($attrs, $content = null, $render_slug) {
         // Add custom CSS
         $this->add_custom_styles($render_slug);
         
