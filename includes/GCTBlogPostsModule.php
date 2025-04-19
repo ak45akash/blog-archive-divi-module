@@ -2,7 +2,7 @@
 /**
  * GCT Blog Posts Module for Divi
  */
-class GCT_Blog_Posts_Module extends ET_Builder_Module {
+class GCT_BlogPostsModule extends ET_Builder_Module {
     public $slug = 'gct_blog_posts';
     public $vb_support = 'on';
     
@@ -731,4 +731,4 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
 }
 
 // This line is essential for Divi to recognize and initialize the module
-new GCT_Blog_Posts_Module; 
+new GCT_BlogPostsModule; 
