@@ -1,0 +1,44 @@
+/* Admin styles for GCT Blog Posts Module */
+
+/* Improve admin field layouts */
+.et-pb-option--gct_blog_posts .et-pb-option-container {
+    max-width: 100%;
+}
+
+/* Style the range inputs */
+.et-pb-range-input:focus {
+    border-color: #2ea3f2;
+}
+
+/* Style the color picker */
+.wp-picker-container .wp-color-result.button {
+    border-color: #dcdcde;
+}
+
+/* Style select dropdowns */
+.et-pb-option--gct_blog_posts select {
+    max-width: 100%;
+}
+
+/* Make the options more readable */
+.et-pb-options-tab {
+    padding: 5px;
+}
+
+/* Fix spacing between options */
+.et-pb-option--gct_blog_posts {
+    margin-bottom: 16px;
+}
+
+/* Fix label alignment */
+.et-pb-option--gct_blog_posts .et-pb-option-label {
+    padding-bottom: 8px;
+}
+
+/* Improve description text */
+.et-pb-option-description {
+    color: #666;
+    font-style: italic;
+    font-size: 13px;
+    margin-top: 3px;
+} 

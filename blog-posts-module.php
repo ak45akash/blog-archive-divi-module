@@ -4,8 +4,8 @@
  * Plugin URI: 
  * Description: A custom Divi module for displaying blog posts with filtering options
  * Version: 1.0.0
- * Author: 
- * Author URI: 
+ * Author: Akash
+ * Author URI: https://iakash.dev
  * License: GPL2
  */
 
@@ -15,41 +15,276 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Register the module to Divi Builder
+ * Main class for the GCT Blog Posts Module
  */
-function gct_blog_posts_module_init() {
-    if (class_exists('ET_Builder_Module')) {
-        include_once('includes/GCTBlogPostsModule.php');
+class GCT_Blog_Posts_Module_Plugin {
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        // Initialize the plugin
+        add_action('et_builder_ready', array($this, 'init_module'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
+        register_activation_hook(__FILE__, array($this, 'activate'));
+        
+        // Add AJAX handlers
+        add_action('wp_ajax_gct_get_filtered_posts', array($this, 'ajax_get_filtered_posts'));
+        add_action('wp_ajax_nopriv_gct_get_filtered_posts', array($this, 'ajax_get_filtered_posts'));
     }
-}
-add_action('et_builder_ready', 'gct_blog_posts_module_init');
 
-/**
- * Enqueue scripts and styles
- */
-function gct_blog_posts_module_enqueue_scripts() {
-    wp_enqueue_style('gct-blog-posts-module-style', plugin_dir_url(__FILE__) . 'css/gct-blog-posts-module.css', array(), '1.0.0');
-    wp_enqueue_script('gct-blog-posts-module-script', plugin_dir_url(__FILE__) . 'js/gct-blog-posts-module.js', array('jquery'), '1.0.0', true);
-}
-add_action('wp_enqueue_scripts', 'gct_blog_posts_module_enqueue_scripts');
+    /**
+     * Initialize the module
+     */
+    public function init_module() {
+        if (class_exists('ET_Builder_Module')) {
+            require_once plugin_dir_path(__FILE__) . 'includes/GCTBlogPostsModule.php';
+        }
+    }
 
-/**
- * Create necessary directories and files if they don't exist
- */
-function gct_blog_posts_module_activate() {
-    // Create includes directory if it doesn't exist
-    if (!file_exists(plugin_dir_path(__FILE__) . 'includes')) {
-        mkdir(plugin_dir_path(__FILE__) . 'includes', 0755);
+    /**
+     * Enqueue scripts and styles
+     */
+    public function enqueue_scripts() {
+        // Main styles
+        wp_enqueue_style(
+            'gct-blog-posts-module-style', 
+            plugin_dir_url(__FILE__) . 'css/gct-blog-posts-module.css', 
+            array(), 
+            '1.0.0'
+        );
+        
+        // Main scripts
+        wp_enqueue_script(
+            'gct-blog-posts-module-script', 
+            plugin_dir_url(__FILE__) . 'js/gct-blog-posts-module.js', 
+            array('jquery'), 
+            '1.0.0', 
+            true
+        );
+
+        // Localize script for AJAX pagination and filtering
+        wp_localize_script(
+            'gct-blog-posts-module-script',
+            'gct_blog_posts_params',
+            array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('gct_blog_posts_nonce'),
+            )
+        );
+    }
+
+    /**
+     * Enqueue admin scripts and styles
+     */
+    public function admin_enqueue_scripts() {
+        wp_enqueue_style(
+            'gct-blog-posts-module-admin-style', 
+            plugin_dir_url(__FILE__) . 'css/admin-style.css', 
+            array(), 
+            '1.0.0'
+        );
+    }
+
+    /**
+     * Plugin activation
+     */
+    public function activate() {
+        // Create necessary directories if they don't exist
+        $directories = array(
+            plugin_dir_path(__FILE__) . 'includes',
+            plugin_dir_path(__FILE__) . 'css',
+            plugin_dir_path(__FILE__) . 'js',
+        );
+        
+        foreach ($directories as $directory) {
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+        }
+
+        // Create admin CSS file if it doesn't exist
+        $admin_css_file = plugin_dir_path(__FILE__) . 'css/admin-style.css';
+        if (!file_exists($admin_css_file)) {
+            file_put_contents($admin_css_file, '/* Admin styles for GCT Blog Posts Module */');
+        }
     }
     
-    // Create css directory if it doesn't exist
-    if (!file_exists(plugin_dir_path(__FILE__) . 'css')) {
-        mkdir(plugin_dir_path(__FILE__) . 'css', 0755);
-    }
-    
-    // Create js directory if it doesn't exist
-    if (!file_exists(plugin_dir_path(__FILE__) . 'js')) {
-        mkdir(plugin_dir_path(__FILE__) . 'js', 0755);
+    /**
+     * AJAX handler for filtered posts
+     */
+    public function ajax_get_filtered_posts() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'gct_blog_posts_nonce')) {
+            wp_send_json_error(array('message' => 'Invalid security token.'));
+        }
+        
+        // Get parameters
+        $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
+        $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'category';
+        $category_id = isset($_POST['category_id']) ? sanitize_text_field($_POST['category_id']) : 'all';
+        $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 6;
+        $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+        
+        // Query arguments
+        $args = array(
+            'post_type'      => $post_type,
+            'posts_per_page' => $posts_per_page,
+            'post_status'    => 'publish',
+            'paged'          => $page,
+        );
+        
+        // Add taxonomy query if category is selected
+        if ($category_id !== 'all' && $taxonomy) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => $taxonomy,
+                    'field'    => 'term_id',
+                    'terms'    => $category_id,
+                ),
+            );
+        }
+        
+        // Get posts
+        $query = new WP_Query($args);
+        
+        // Calculate total pages for pagination
+        $total_pages = $query->max_num_pages;
+        
+        ob_start();
+        
+        // Start posts grid
+        echo '<div class="gct-blog-posts-grid posts-per-row-3">';
+        
+        // Loop through posts
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                
+                // Get featured image
+                $has_thumbnail = has_post_thumbnail();
+                $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
+                $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
+                
+                // Get categories
+                $categories = '';
+                if ($post_type === 'post') {
+                    $post_categories = get_the_category();
+                    if (!empty($post_categories)) {
+                        $categories = '<div class="gct-post-categories">';
+                        foreach ($post_categories as $category) {
+                            $categories .= sprintf(
+                                '<span class="gct-post-category">%1$s</span>',
+                                esc_html($category->name)
+                            );
+                        }
+                        $categories .= '</div>';
+                    }
+                } else {
+                    $taxonomies = get_object_taxonomies($post_type, 'objects');
+                    if (!empty($taxonomies)) {
+                        $taxonomy_key = key($taxonomies);
+                        $terms = get_the_terms(get_the_ID(), $taxonomy_key);
+                        if (!empty($terms) && !is_wp_error($terms)) {
+                            $categories = '<div class="gct-post-categories">';
+                            foreach ($terms as $term) {
+                                $categories .= sprintf(
+                                    '<span class="gct-post-category">%1$s</span>',
+                                    esc_html($term->name)
+                                );
+                            }
+                            $categories .= '</div>';
+                        }
+                    }
+                }
+                
+                // Get date
+                $date = sprintf(
+                    '<div class="gct-post-date">%1$s</div>',
+                    esc_html(get_the_date())
+                );
+                
+                // Get excerpt
+                $raw_excerpt = get_the_excerpt();
+                $trimmed_excerpt = wp_trim_words($raw_excerpt, 30, '...');
+                $excerpt = sprintf(
+                    '<div class="gct-post-excerpt">%1$s</div>',
+                    esc_html($trimmed_excerpt)
+                );
+                
+                // Build post item
+                echo '<article class="gct-post-item">';
+                
+                // Post thumbnail with overlay
+                echo sprintf(
+                    '<a href="%1$s" class="gct-post-thumbnail" %2$s>
+                        <div class="gct-post-overlay">
+                            <span class="et-pb-icon">&#xe089;</span>
+                        </div>
+                    </a>',
+                    esc_url(get_permalink()),
+                    $thumbnail_style
+                );
+                
+                // Post content
+                echo '<div class="gct-post-content">';
+                
+                // Post meta
+                echo '<div class="gct-post-meta">';
+                echo $categories;
+                echo $date;
+                echo '</div>';
+                
+                // Post title
+                echo sprintf(
+                    '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
+                    esc_url(get_permalink()),
+                    esc_html(get_the_title())
+                );
+                
+                // Post excerpt
+                echo $excerpt;
+                
+                // Close post content
+                echo '</div>';
+                
+                // Close post item
+                echo '</article>';
+            }
+            
+            // Reset post data
+            wp_reset_postdata();
+        } else {
+            echo '<p class="gct-no-posts">' . esc_html__('No posts found.', 'gct-blog-posts-module') . '</p>';
+        }
+        
+        // Close posts grid
+        echo '</div>';
+        
+        // Add pagination
+        echo '<div class="gct-pagination">';
+        
+        // Numbers pagination
+        for ($i = 1; $i <= $total_pages; $i++) {
+            $active_class = $i === $page ? ' active' : '';
+            echo sprintf(
+                '<a href="#" class="gct-page-number%2$s" data-page="%1$s">%1$s</a>',
+                esc_attr($i),
+                esc_attr($active_class)
+            );
+        }
+        
+        echo '</div>';
+        
+        $html = ob_get_clean();
+        
+        wp_send_json_success(array(
+            'html' => $html,
+            'page' => $page,
+            'total_pages' => $total_pages,
+        ));
     }
 }
-register_activation_hook(__FILE__, 'gct_blog_posts_module_activate'); 
+
+// Initialize the plugin
+new GCT_Blog_Posts_Module_Plugin(); 
