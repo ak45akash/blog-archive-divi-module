@@ -4,8 +4,8 @@ Plugin Name: GCT Blog Posts Module for Divi
 Plugin URI: 
 Description: A custom Divi module for displaying blog posts with filtering options
 Version: 1.0.0
-Author: Akash
-Author URI: https://iakash.dev
+Author: 
+Author URI: 
 License: GPL2
 Text Domain: gct-blog-posts-module
 */
@@ -26,7 +26,7 @@ function gct_blog_posts_initialize_extension() {
     if (class_exists('ET_Builder_Module')) {
         require_once GCT_BPM_PLUGIN_DIR . 'includes/GCTBlogPostsModule.php';
         
-        new GCT_Blog_Posts_Module();
+        // Do not instantiate the module here, it's done in the module file
         
         if (function_exists('et_builder_add_main_css')) {
             et_builder_add_main_css('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css');

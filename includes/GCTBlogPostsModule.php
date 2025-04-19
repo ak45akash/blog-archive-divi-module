@@ -18,6 +18,7 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
      * Module initialization
      */
     public function init() {
+        $this->name = esc_html__('Blog Posts Grid', 'gct-blog-posts-module');
         $this->icon = 'j';
         $this->main_css_element = '%%order_class%%.gct_blog_posts';
         
@@ -737,4 +738,5 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
     }
 }
 
-new GCT_Blog_Posts_Module; 
+// This line is essential for Divi to recognize and initialize the module
+new GCT_Blog_Posts_Module(); 
