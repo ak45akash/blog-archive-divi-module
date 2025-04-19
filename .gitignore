@@ -1,0 +1,46 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules and build assets
+/node_modules/
+/build/
+/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# WordPress specific
+.htaccess
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/wp-cache-config.php
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*~
+
+# Package managers
+composer.phar
+/vendor/
+package-lock.json
+yarn.lock 
