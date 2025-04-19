@@ -5,14 +5,6 @@
 class GCT_Blog_Posts_Module extends ET_Builder_Module {
     public $slug = 'gct_blog_posts';
     public $vb_support = 'on';
-    public $child_slug = '';
-    public $name = 'Blog Posts Grid';
-    
-    protected $module_credits = array(
-        'module_uri' => '',
-        'author'     => '',
-        'author_uri' => '',
-    );
     
     /**
      * Module initialization
@@ -20,7 +12,7 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
     public function init() {
         $this->name = esc_html__('Blog Posts Grid', 'gct-blog-posts-module');
         $this->icon = 'j';
-        $this->main_css_element = '%%order_class%%.gct_blog_posts';
+        $this->main_css_element = '%%order_class%%';
         
         $this->settings_modal_toggles = array(
             'general' => array(
@@ -739,4 +731,4 @@ class GCT_Blog_Posts_Module extends ET_Builder_Module {
 }
 
 // This line is essential for Divi to recognize and initialize the module
-new GCT_Blog_Posts_Module(); 
+new GCT_Blog_Posts_Module; 

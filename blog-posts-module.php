@@ -10,7 +10,6 @@ License: GPL2
 Text Domain: gct-blog-posts-module
 */
 
-// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -25,8 +24,6 @@ define('GCT_BPM_PLUGIN_URL', plugin_dir_url(__FILE__));
 function gct_blog_posts_initialize_extension() {
     if (class_exists('ET_Builder_Module')) {
         require_once GCT_BPM_PLUGIN_DIR . 'includes/GCTBlogPostsModule.php';
-        
-        // Do not instantiate the module here, it's done in the module file
         
         if (function_exists('et_builder_add_main_css')) {
             et_builder_add_main_css('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css');
@@ -90,19 +87,6 @@ function gct_blog_posts_activate() {
             'Plugin dependency check',
             array('back_link' => true)
         );
-    }
-    
-    // Create necessary directories if they don't exist
-    $directories = array(
-        GCT_BPM_PLUGIN_DIR . 'includes',
-        GCT_BPM_PLUGIN_DIR . 'css',
-        GCT_BPM_PLUGIN_DIR . 'js',
-    );
-    
-    foreach ($directories as $directory) {
-        if (!file_exists($directory)) {
-            mkdir($directory, 0755, true);
-        }
     }
 }
 
