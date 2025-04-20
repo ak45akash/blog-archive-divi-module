@@ -54,7 +54,6 @@
         
         .et-pb-icon {
             font-family: 'ETmodules';
-            content: attr(data-icon);
             speak: none;
             font-weight: normal;
             font-variant: normal;
@@ -105,180 +104,291 @@
             <button class="view-btn" data-width="mobile">Mobile</button>
         </div>
         
-        <!-- Module Preview: 3 Posts Per Row -->
+        <!-- Module Preview -->
         <div class="gct_blog_posts">
-            <h2 class="gct-module-title">Latest News</h2>
-            
-            <div class="gct-blog-posts-grid posts-per-row-3">
-                <!-- Post 1 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=1');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Announcements</span>
-                            </div>
-                            <div class="gct-post-date">February 26, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">Official site name approved – Welcome to Harkness Memorial Park</a></h3>
-                        <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
-                    </div>
-                </article>
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6">
+                <h2 class="gct-module-title">Latest News</h2>
                 
-                <!-- Post 2 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=2');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Operational updates</span>
-                            </div>
-                            <div class="gct-post-date">March 26, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">New grave construction works underway at Keilor Cemetery</a></h3>
-                        <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</div>
-                    </div>
-                </article>
+                <!-- Category Filter -->
+                <div class="gct-category-filter">
+                    <label>Category</label>
+                    <select class="gct-category-select" data-taxonomy="category">
+                        <option value="all">All Categories</option>
+                        <option value="1">Announcements</option>
+                        <option value="2">Operational updates</option>
+                        <option value="3">General</option>
+                    </select>
+                </div>
                 
-                <!-- Post 3 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=3');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Announcements</span>
+                <div class="gct-posts-wrapper">
+                    <!-- Posts Grid -->
+                    <div class="gct-blog-posts-grid posts-per-row-3">
+                        <!-- Post 1 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=1');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Announcements</span>
+                                    </div>
+                                    <div class="gct-post-date">February 26, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Official site name approved – Welcome to Harkness Memorial Park</a></h3>
+                                <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
                             </div>
-                            <div class="gct-post-date">March 17, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">A tribute to David Cragg, former Trust member</a></h3>
-                        <div class="gct-post-excerpt">Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum nulla sed consectetur.</div>
-                    </div>
-                </article>
-                
-                <!-- Post 4 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=4');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Operational updates</span>
+                        </article>
+                        
+                        <!-- Post 2 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=2');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Operational updates</span>
+                                    </div>
+                                    <div class="gct-post-date">March 26, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">New grave construction works underway at Keilor Cemetery</a></h3>
+                                <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</div>
                             </div>
-                            <div class="gct-post-date">January 12, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">Front entrance improvement works at Fawkner Memorial Park</a></h3>
-                        <div class="gct-post-excerpt">Donec id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus et magnis dis parturient montes.</div>
-                    </div>
-                </article>
-                
-                <!-- Post 5 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=5');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Announcements</span>
+                        </article>
+                        
+                        <!-- Post 3 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=3');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Announcements</span>
+                                    </div>
+                                    <div class="gct-post-date">March 17, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">A tribute to David Cragg, former Trust member</a></h3>
+                                <div class="gct-post-excerpt">Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum nulla sed consectetur.</div>
                             </div>
-                            <div class="gct-post-date">December 5, 2024</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">Principal Design Consultant appointed for memorial park development in Harkness</a></h3>
-                        <div class="gct-post-excerpt">Vestibulum id ligula porta felis euismod semper. Nullam quis risus eget urna mollis ornare vel eu leo.</div>
-                    </div>
-                </article>
-                
-                <!-- Post 6 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=6');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">General</span>
+                        </article>
+                        
+                        <!-- Post 4 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=4');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Operational updates</span>
+                                    </div>
+                                    <div class="gct-post-date">January 12, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Front entrance improvement works at Fawkner Memorial Park</a></h3>
+                                <div class="gct-post-excerpt">Donec id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus et magnis dis parturient montes.</div>
                             </div>
-                            <div class="gct-post-date">November 27, 2024</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">Thank you for attending our Annual Meeting</a></h3>
-                        <div class="gct-post-excerpt">Curabitur blandit tempus porttitor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio.</div>
+                        </article>
+                        
+                        <!-- Post 5 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=5');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Announcements</span>
+                                    </div>
+                                    <div class="gct-post-date">December 5, 2024</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Principal Design Consultant appointed for memorial park development in Harkness</a></h3>
+                                <div class="gct-post-excerpt">Vestibulum id ligula porta felis euismod semper. Nullam quis risus eget urna mollis ornare vel eu leo.</div>
+                            </div>
+                        </article>
+                        
+                        <!-- Post 6 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=6');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">General</span>
+                                    </div>
+                                    <div class="gct-post-date">November 27, 2024</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Thank you for attending our Annual Meeting</a></h3>
+                                <div class="gct-post-excerpt">Curabitur blandit tempus porttitor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio.</div>
+                            </div>
+                        </article>
                     </div>
-                </article>
+                    
+                    <!-- Pagination -->
+                    <div class="gct-pagination">
+                        <a href="#" class="gct-page-number active" data-page="1">1</a>
+                        <a href="#" class="gct-page-number" data-page="2">2</a>
+                        <a href="#" class="gct-page-number" data-page="3">3</a>
+                    </div>
+                </div>
             </div>
         </div>
         
         <hr>
         
-        <!-- Module Preview: 2 Posts Per Row -->
+        <!-- Module Preview: Load More Button Style -->
         <div class="gct_blog_posts">
-            <h2 class="gct-module-title">Featured Posts</h2>
-            
-            <div class="gct-blog-posts-grid posts-per-row-2">
-                <!-- Post 1 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=7');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">Events</span>
-                            </div>
-                            <div class="gct-post-date">April 15, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">Upcoming Memorial Service Events</a></h3>
-                        <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
-                    </div>
-                </article>
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="2">
+                <h2 class="gct-module-title">Featured Posts</h2>
                 
-                <!-- Post 2 -->
-                <article class="gct-post-item item-visible">
-                    <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=8');">
-                        <div class="gct-post-overlay">
-                            <span class="et-pb-icon">&#xe089;</span>
-                        </div>
-                    </a>
-                    <div class="gct-post-content">
-                        <div class="gct-post-meta">
-                            <div class="gct-post-categories">
-                                <span class="gct-post-category">News</span>
+                <div class="gct-posts-wrapper">
+                    <!-- Posts Grid -->
+                    <div class="gct-blog-posts-grid posts-per-row-2">
+                        <!-- Post 1 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=7');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Events</span>
+                                    </div>
+                                    <div class="gct-post-date">April 15, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Upcoming Memorial Service Events</a></h3>
+                                <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
                             </div>
-                            <div class="gct-post-date">April 5, 2025</div>
-                        </div>
-                        <h3 class="gct-post-title"><a href="#">New Community Garden Opening</a></h3>
-                        <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</div>
+                        </article>
+                        
+                        <!-- Post 2 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=8');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">News</span>
+                                    </div>
+                                    <div class="gct-post-date">April 5, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">New Community Garden Opening</a></h3>
+                                <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</div>
+                            </div>
+                        </article>
                     </div>
-                </article>
+                    
+                    <!-- Load More Button -->
+                    <div class="gct-pagination">
+                        <a href="#" class="gct-load-more" data-page="2">See more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Module Preview: Prev/Next Style -->
+        <div class="gct_blog_posts">
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="3">
+                <h2 class="gct-module-title">Recent Articles</h2>
+                
+                <div class="gct-posts-wrapper">
+                    <!-- Posts Grid -->
+                    <div class="gct-blog-posts-grid posts-per-row-3">
+                        <!-- Post 1 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=9');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Updates</span>
+                                    </div>
+                                    <div class="gct-post-date">May 5, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Summer Maintenance Update</a></h3>
+                                <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis.</div>
+                            </div>
+                        </article>
+                        
+                        <!-- Post 2 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=10');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Events</span>
+                                    </div>
+                                    <div class="gct-post-date">May 12, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Annual Memorial Day Service</a></h3>
+                                <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis.</div>
+                            </div>
+                        </article>
+                        
+                        <!-- Post 3 -->
+                        <article class="gct-post-item item-visible">
+                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=11');">
+                                <div class="gct-post-overlay">
+                                    <span class="et-pb-icon">&#xe089;</span>
+                                </div>
+                            </a>
+                            <div class="gct-post-content">
+                                <div class="gct-post-meta">
+                                    <div class="gct-post-categories">
+                                        <span class="gct-post-category">Community</span>
+                                    </div>
+                                    <div class="gct-post-date">May 18, 2025</div>
+                                </div>
+                                <h3 class="gct-post-title"><a href="#">Volunteer Opportunities Available</a></h3>
+                                <div class="gct-post-excerpt">Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum.</div>
+                            </div>
+                        </article>
+                    </div>
+                    
+                    <!-- Prev/Next Pagination -->
+                    <div class="gct-pagination">
+                        <a href="#" class="gct-prev-page" data-page="0">&laquo; Previous</a>
+                        <a href="#" class="gct-next-page" data-page="2">Next &raquo;</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript to simulate responsive behavior -->
+    <!-- JavaScript to simulate module functionality -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/gct-blog-posts-module.js"></script>
     <script>
         $(document).ready(function() {
+            // Initialize the blog posts modules
+            initGCTBlogPostsModule();
+            
             // Responsive preview controls
             $('.view-btn').on('click', function() {
                 $('.view-btn').removeClass('active');
@@ -300,23 +410,113 @@
                 }
             });
             
-            // Override the actual grid layout for the preview
-            $('.posts-per-row-3').css('grid-template-columns', 'repeat(3, 1fr)');
-            $('.posts-per-row-2').css('grid-template-columns', 'repeat(2, 1fr)');
-            
-            // Add media queries for the preview
-            $(window).on('resize', function() {
-                const containerWidth = $('.container').width();
+            // For preview purposes only - simulate AJAX responses
+            function initGCTBlogPostsModule() {
+                $('.gct-category-select').on('change', function() {
+                    const $select = $(this);
+                    const $container = $select.closest('.gct-blog-posts-container');
+                    const $postsWrapper = $container.find('.gct-posts-wrapper');
+                    const categoryId = $select.val();
+                    
+                    // Simulate loading
+                    $postsWrapper.css('opacity', 0.5);
+                    
+                    // Simulate AJAX delay
+                    setTimeout(function() {
+                        // Filter posts based on selected category
+                        const $posts = $container.find('.gct-post-item');
+                        $posts.removeClass('item-visible');
+                        
+                        if (categoryId === 'all') {
+                            $posts.addClass('item-visible');
+                        } else {
+                            $posts.each(function() {
+                                const $post = $(this);
+                                const $category = $post.find('.gct-post-category');
+                                
+                                if (categoryId === '1' && $category.text() === 'Announcements') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '2' && $category.text() === 'Operational updates') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '3' && $category.text() === 'General') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '4' && $category.text() === 'Events') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '5' && $category.text() === 'News') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '6' && $category.text() === 'Updates') {
+                                    $post.addClass('item-visible');
+                                } else if (categoryId === '7' && $category.text() === 'Community') {
+                                    $post.addClass('item-visible');
+                                }
+                            });
+                        }
+                        
+                        // Restore opacity
+                        $postsWrapper.css('opacity', 1);
+                    }, 600);
+                });
                 
-                if (containerWidth <= 767) {
-                    $('.gct-blog-posts-grid').css('grid-template-columns', 'repeat(1, 1fr)');
-                } else if (containerWidth <= 980) {
-                    $('.gct-blog-posts-grid').css('grid-template-columns', 'repeat(2, 1fr)');
-                } else {
-                    $('.posts-per-row-3').css('grid-template-columns', 'repeat(3, 1fr)');
-                    $('.posts-per-row-2').css('grid-template-columns', 'repeat(2, 1fr)');
-                }
-            }).trigger('resize');
+                // Handle pagination clicks
+                $('.gct-pagination a').on('click', function(e) {
+                    e.preventDefault();
+                    const $link = $(this);
+                    const $container = $link.closest('.gct-blog-posts-container');
+                    const $postsWrapper = $container.find('.gct-posts-wrapper');
+                    
+                    // Simulate loading
+                    $postsWrapper.css('opacity', 0.5);
+                    
+                    // Update active state for numbered pagination
+                    if ($link.hasClass('gct-page-number')) {
+                        $container.find('.gct-page-number').removeClass('active');
+                        $link.addClass('active');
+                    }
+                    
+                    // Scroll to top of container
+                    $('html, body').animate({
+                        scrollTop: $container.offset().top - 50
+                    }, 300);
+                    
+                    // Simulate AJAX loading delay
+                    setTimeout(function() {
+                        // Restore opacity
+                        $postsWrapper.css('opacity', 1);
+                        
+                        // For preview purposes, show a message
+                        alert('In a live environment, this would load page ' + $link.data('page') + ' via AJAX.');
+                    }, 600);
+                });
+                
+                // Handle image loading animation
+                $('.gct-post-thumbnail').each(function() {
+                    const $thumbnail = $(this);
+                    const bgImage = $thumbnail.css('background-image');
+                    
+                    if (bgImage && bgImage !== 'none') {
+                        const url = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+                        
+                        if (url && url[1]) {
+                            const img = new Image();
+                            img.onload = function() {
+                                $thumbnail.addClass('image-loaded');
+                            };
+                            img.src = url[1];
+                        }
+                    } else {
+                        $thumbnail.addClass('no-image');
+                    }
+                });
+                
+                // Add staggered animation for posts
+                $('.gct-post-item').each(function(index) {
+                    const $item = $(this);
+                    
+                    setTimeout(function() {
+                        $item.addClass('item-visible');
+                    }, index * 100);
+                });
+            }
         });
     </script>
 </body>
