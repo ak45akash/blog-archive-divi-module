@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GCT_BPM_VERSION', '1.0.0');
+define('GCT_BPM_VERSION', '1.0.1');
 define('GCT_BPM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GCT_BPM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -29,7 +29,7 @@ function gct_blog_posts_initialize_extension() {
         new GCT_BlogPostsModule();
         
         if (function_exists('et_builder_add_main_css')) {
-            et_builder_add_main_css('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css');
+            et_builder_add_main_css('gct-blog-posts-module-style-v2', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module-v2.css');
         }
     }
 }
@@ -63,12 +63,12 @@ add_action('admin_notices', 'gct_blog_posts_admin_notice_missing_divi');
  * Enqueue scripts and styles
  */
 function gct_blog_posts_enqueue_scripts() {
-    wp_enqueue_style('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css', array(), GCT_BPM_VERSION);
-    wp_enqueue_script('gct-blog-posts-module-script', GCT_BPM_PLUGIN_URL . 'js/gct-blog-posts-module.js', array('jquery'), GCT_BPM_VERSION, true);
+    wp_enqueue_style('gct-blog-posts-module-style-v2', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module-v2.css', array(), GCT_BPM_VERSION);
+    wp_enqueue_script('gct-blog-posts-module-script-v2', GCT_BPM_PLUGIN_URL . 'js/gct-blog-posts-module-v2.js', array('jquery'), GCT_BPM_VERSION, true);
     
     // Localize script for AJAX pagination and filtering
     wp_localize_script(
-        'gct-blog-posts-module-script',
+        'gct-blog-posts-module-script-v2',
         'gct_blog_posts_params',
         array(
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -121,6 +121,30 @@ function gct_get_filtered_posts() {
     $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 6;
     $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
     
+    // Get module settings from AJAX request
+    $module_settings = isset($_POST['module_settings']) ? $_POST['module_settings'] : null;
+    
+    // Parse module settings
+    $show_category = true;
+    $show_date = true;
+    $show_excerpt = true;
+    $pagination_type = 'numbers';
+    $load_more_text = 'See more';
+    
+    if ($module_settings) {
+        if (is_string($module_settings)) {
+            $module_settings = json_decode(stripslashes($module_settings), true);
+        }
+        
+        if (is_array($module_settings)) {
+            $show_category = isset($module_settings['show_category']) ? ($module_settings['show_category'] === 'on') : true;
+            $show_date = isset($module_settings['show_date']) ? ($module_settings['show_date'] === 'on') : true;
+            $show_excerpt = isset($module_settings['show_excerpt']) ? ($module_settings['show_excerpt'] === 'on') : true;
+            $pagination_type = isset($module_settings['pagination_type']) ? $module_settings['pagination_type'] : 'numbers';
+            $load_more_text = isset($module_settings['load_more_text']) ? $module_settings['load_more_text'] : 'See more';
+        }
+    }
+    
     // Query arguments
     $args = array(
         'post_type'      => $post_type,
@@ -163,7 +187,7 @@ function gct_get_filtered_posts() {
             
             // Get categories
             $categories = '';
-            if ($post_type === 'post') {
+            if ($show_category && $post_type === 'post') {
                 $post_categories = get_the_category();
                 if (!empty($post_categories)) {
                     $categories = '<div class="gct-post-categories">';
@@ -175,7 +199,7 @@ function gct_get_filtered_posts() {
                     }
                     $categories .= '</div>';
                 }
-            } else {
+            } else if ($show_category) {
                 $taxonomies = get_object_taxonomies($post_type, 'objects');
                 if (!empty($taxonomies)) {
                     $taxonomy_key = key($taxonomies);
@@ -194,21 +218,57 @@ function gct_get_filtered_posts() {
             }
             
             // Get date
-            $date = sprintf(
-                '<div class="gct-post-date">%1$s</div>',
-                esc_html(get_the_date())
-            );
+            $date = '';
+            if ($show_date) {
+                $date = sprintf(
+                    '<div class="gct-post-date">%1$s</div>',
+                    esc_html(get_the_date())
+                );
+            }
             
             // Get excerpt
-            $raw_excerpt = get_the_excerpt();
-            $trimmed_excerpt = wp_trim_words($raw_excerpt, 30, '...');
-            $excerpt = sprintf(
-                '<div class="gct-post-excerpt">%1$s</div>',
-                esc_html($trimmed_excerpt)
-            );
+            $excerpt = '';
+            if ($show_excerpt) {
+                $raw_excerpt = get_the_excerpt();
+                $trimmed_excerpt = wp_trim_words($raw_excerpt, 30, '...');
+                $excerpt = sprintf(
+                    '<div class="gct-post-excerpt">%1$s</div>',
+                    esc_html($trimmed_excerpt)
+                );
+            }
             
             // Build post item
             echo '<article class="gct-post-item">';
+            
+            // Show category in top-right if enabled
+            if ($show_category && !empty($categories)) {
+                echo '<div class="gct-post-meta-top">';
+                // Display only the first category in the top-right
+                $first_category = '';
+                if ($post_type === 'post') {
+                    $post_categories = get_the_category();
+                    if (!empty($post_categories)) {
+                        $first_category = sprintf(
+                            '<span class="gct-post-category">%1$s</span>',
+                            esc_html($post_categories[0]->name)
+                        );
+                    }
+                } else {
+                    $taxonomies = get_object_taxonomies($post_type, 'objects');
+                    if (!empty($taxonomies)) {
+                        $taxonomy_key = key($taxonomies);
+                        $terms = get_the_terms(get_the_ID(), $taxonomy_key);
+                        if (!empty($terms) && !is_wp_error($terms)) {
+                            $first_category = sprintf(
+                                '<span class="gct-post-category">%1$s</span>',
+                                esc_html($terms[0]->name)
+                            );
+                        }
+                    }
+                }
+                echo $first_category;
+                echo '</div>';
+            }
             
             // Post thumbnail with overlay
             echo sprintf(
@@ -250,32 +310,60 @@ function gct_get_filtered_posts() {
         // Reset post data
         wp_reset_postdata();
     } else {
-        echo '<p class="gct-no-posts">' . esc_html__('No posts found.', 'gct-blog-posts-module') . '</p>';
+        // No posts
+        echo '<div class="gct-no-posts">No posts found.</div>';
     }
     
     // Close posts grid
     echo '</div>';
     
-    // Add pagination
-    echo '<div class="gct-pagination">';
-    
-    // Numbers pagination
-    for ($i = 1; $i <= $total_pages; $i++) {
-        $active_class = $i === $page ? ' active' : '';
-        echo sprintf(
-            '<a href="#" class="gct-page-number%2$s" data-page="%1$s">%1$s</a>',
-            esc_attr($i),
-            esc_attr($active_class)
-        );
+    // Add pagination if there are multiple pages
+    if ($total_pages > 1) {
+        // Different pagination styles based on settings
+        if ($pagination_type === 'load_more') {
+            // Load more button
+            echo '<div class="gct-pagination">';
+            echo sprintf(
+                '<a href="#" class="gct-load-more" data-page="%1$s">%2$s</a>',
+                $page + 1,
+                esc_html($load_more_text)
+            );
+            echo '</div>';
+        } else if ($pagination_type === 'prev_next') {
+            // Prev/Next pagination
+            echo '<div class="gct-pagination">';
+            // Previous link
+            $prev_disabled = ($page <= 1) ? 'disabled' : '';
+            echo sprintf(
+                '<a href="#" class="gct-pagination-prev %1$s" data-page="%2$s">← Previous</a>',
+                $prev_disabled,
+                $page - 1
+            );
+            
+            // Next link
+            $next_disabled = ($page >= $total_pages) ? 'disabled' : '';
+            echo sprintf(
+                '<a href="#" class="gct-pagination-next %1$s" data-page="%2$s">Next →</a>',
+                $next_disabled,
+                $page + 1
+            );
+            echo '</div>';
+        } else {
+            // Numbered pagination (default)
+            echo '<div class="gct-pagination">';
+            for ($i = 1; $i <= $total_pages; $i++) {
+                $active_class = ($i === $page) ? 'active' : '';
+                echo sprintf(
+                    '<a href="#" class="%1$s" data-page="%2$s">%2$s</a>',
+                    $active_class,
+                    $i
+                );
+            }
+            echo '</div>';
+        }
     }
-    
-    echo '</div>';
     
     $html = ob_get_clean();
     
-    wp_send_json_success(array(
-        'html' => $html,
-        'page' => $page,
-        'total_pages' => $total_pages,
-    ));
+    wp_send_json_success(array('html' => $html));
 } 

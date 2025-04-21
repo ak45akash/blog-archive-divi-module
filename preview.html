@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCT Blog Posts Module Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/gct-blog-posts-module.css">
+    <link rel="stylesheet" href="css/gct-blog-posts-module-v2.css">
     <style>
-        /* Preview styles to mimic WordPress/Divi environment */
+        /* Preview-specific styles only */
         body {
             font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
             background-color: #f5f5f5;
@@ -40,232 +40,10 @@
             color: #666;
         }
         
-        .gct_blog_posts {
-            margin-bottom: 60px;
-        }
-        
-        /* Module styles */
-        .gct-module-title {
-            margin-bottom: 30px;
-            font-size: 32px;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-            color: #000;
-            font-weight: 600;
-        }
-        
-        .gct-blog-posts-grid {
-            display: grid;
-            grid-gap: 30px;
-        }
-        
-        .posts-per-row-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        
-        .posts-per-row-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .gct-post-item {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .gct-post-meta-top {
-            position: absolute;
-            top: 200px;
-            right: 10px;
-            z-index: 5;
-        }
-        
-        .gct-post-meta-top .gct-post-category {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #fff;
-            color: #244B45;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-        }
-        
-        .gct-post-thumbnail {
-            display: block;
-            position: relative;
-            height: 240px;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #f5f5f5;
-        }
-        
-        .gct-post-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        
-        .gct-post-thumbnail:hover .gct-post-overlay {
-            opacity: 1;
-        }
-        
-        .et-pb-icon {
-            color: #ffffff;
-            font-size: 32px;
-        }
-        
-        .gct-post-content {
-            padding: 20px 0;
-        }
-        
-        .gct-post-meta {
-            margin-bottom: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .gct-post-category {
-            display: inline-block;
-            padding: 3px 8px;
-            background-color: #f0f0f0;
-            color: #666;
-            font-size: 12px;
-            border-radius: 3px;
-        }
-        
-        .gct-post-date {
-            font-size: 14px;
-            color: #999;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-        }
-        
-        .gct-post-title {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 20px;
-            line-height: 1.3;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-        }
-        
-        .gct-post-title a {
-            color: #244B45;
-            text-decoration: none;
-        }
-        
-        .gct-post-excerpt {
-            font-size: 16px;
-            line-height: 1.5;
-            color: #666;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-        }
-        
-        .gct-category-filter {
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .gct-category-filter label {
-            font-weight: normal;
-            font-size: 16px;
-            color: #000;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-        }
-        
-        .gct-category-filter select {
-            padding: 8px 30px 8px 12px;
-            background-color: #eee;
-            border: none;
-            border-radius: 0;
-            font-size: 16px;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 16px;
-            min-width: 240px;
-            color: #000;
-        }
-        
-        .gct-pagination {
-            margin-top: 40px;
-            display: flex;
-            /* justify-content: center; */
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .gct-pagination a {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 0 5px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        /* .gct-pagination a.active {
-            background-color: #2ea3f2;
-            color: #fff;
-        } */
-        
-        
-        .gct-pagination a.active:hover {
-            background-color: #0c71c3;
-        }
-        
-        .gct-load-more {
-            display: inline-block;
-            padding: 12px 35px;
-            background-color: #F6941C;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .gct-load-more:hover {
-            background-color: #244B45;
-            color: #ffffff;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-        
-        .gct-load-more.loading {
-            background-color: #F6941C;
-            opacity: 0.8;
-            color: #ffffff;
-            cursor: wait;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 980px) {
-            .gct-blog-posts-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-        }
-        
-        @media (max-width: 767px) {
-            .gct-blog-posts-grid {
-                grid-template-columns: repeat(1, 1fr) !important;
-            }
+        hr {
+            margin: 40px 0;
+            border: 0;
+            border-top: 1px solid #ddd;
         }
         
         /* Divi icon font simulation */
@@ -284,6 +62,8 @@
             text-transform: none;
             line-height: 1;
             -webkit-font-smoothing: antialiased;
+            color: #ffffff;
+            font-size: 32px;
         }
         
         /* Responsive controls */
@@ -313,7 +93,7 @@
             color: white;
             border-color: #2ea3f2;
         }
-
+        
         /* Style for the pagination types selector */
         .pagination-type-selector {
             display: flex;
@@ -340,63 +120,6 @@
             background-color: #2ea3f2;
             color: white;
             border-color: #2ea3f2;
-        }
-
-        /* Numbered pagination styles */
-        .gct-pagination.numbers-pagination {
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .gct-pagination.numbers-pagination a {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 0 5px;
-            color: #666;
-            background-color: #f0f0f0;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .gct-pagination.numbers-pagination a.active {
-            background-color: #2ea3f2;
-            color: #fff;
-        }
-
-        .gct-pagination.numbers-pagination a:hover {
-            background-color: #e0e0e0;
-        }
-
-        .gct-pagination.numbers-pagination a.active:hover {
-            background-color: #0c71c3;
-        }
-
-        /* Prev/Next pagination styles */
-        .gct-pagination.prev-next-pagination {
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-
-        .gct-pagination.prev-next-pagination a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #f0f0f0;
-            color: #666;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .gct-pagination.prev-next-pagination a:hover {
-            background-color: #e0e0e0;
-        }
-
-        .gct-pagination.prev-next-pagination a.disabled {
-            opacity: 0.5;
-            cursor: default;
-            pointer-events: none;
         }
     </style>
 </head>
@@ -586,7 +309,7 @@
                     </div>
                     
                     <!-- Numbered Pagination -->
-                    <div class="gct-pagination numbers-pagination">
+                    <div class="gct-pagination">
                         <a href="#" class="active" data-page="1">1</a>
                         <a href="#" data-page="2">2</a>
                         <a href="#" data-page="3">3</a>
@@ -618,7 +341,7 @@
                     </div>
                     
                     <!-- Prev/Next Pagination -->
-                    <div class="gct-pagination prev-next-pagination">
+                    <div class="gct-pagination">
                         <a href="#" class="gct-pagination-prev disabled" data-page="0">← Previous</a>
                         <a href="#" class="gct-pagination-next" data-page="2">Next →</a>
                     </div>
@@ -636,7 +359,7 @@
             nonce: 'preview-nonce'
         };
     </script>
-    <script src="js/gct-blog-posts-module.js"></script>
+    <script src="js/gct-blog-posts-module-v2.js"></script>
     <script>
         $(document).ready(function() {
             // Clone posts to other examples
@@ -692,6 +415,13 @@
                     const data = options.data;
                     const categoryId = data.category_id;
                     const page = data.page;
+                    const moduleSettings = data.module_settings;
+                    
+                    // Parse module settings
+                    let settings = moduleSettings;
+                    if (typeof moduleSettings === 'string') {
+                        settings = JSON.parse(moduleSettings);
+                    }
                     
                     // Generate sample posts HTML
                     let postsHTML = '';
@@ -745,14 +475,14 @@
                             responseHTML += '<div class="gct-pagination"></div>';
                         }
                     } else if (paginationType === 'numbers') {
-                        responseHTML += '<div class="gct-pagination numbers-pagination">';
+                        responseHTML += '<div class="gct-pagination">';
                         for (let i = 1; i <= 3; i++) {
                             const activeClass = (i === page) ? 'active' : '';
                             responseHTML += '<a href="#" class="' + activeClass + '" data-page="' + i + '">' + i + '</a>';
                         }
                         responseHTML += '</div>';
                     } else if (paginationType === 'prev_next') {
-                        responseHTML += '<div class="gct-pagination prev-next-pagination">';
+                        responseHTML += '<div class="gct-pagination">';
                         
                         // Prev button, disabled if on first page
                         const prevDisabled = (page <= 1) ? 'disabled' : '';
@@ -776,120 +506,6 @@
                     }
                 }, 1000);
             };
-            
-            // Initialize the module functionality
-            initGCTBlogPostsModule();
-            
-            // Extend the module functionality for the pagination examples
-            $('.gct-pagination.numbers-pagination a').on('click', function(e) {
-                e.preventDefault();
-                
-                const $link = $(this);
-                const $container = $link.closest('.gct-blog-posts-container');
-                const postType = $container.data('post-type');
-                const postsPerPage = $container.data('posts-per-page');
-                const page = $link.data('page');
-                let categoryId = 'all';
-                let taxonomy = 'category';
-                
-                // Get current category if set
-                const $select = $container.find('.gct-category-select');
-                if ($select.length) {
-                    categoryId = $select.val();
-                    taxonomy = $select.data('taxonomy');
-                }
-                
-                // Get and replace posts with filtered ones
-                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, false);
-            });
-            
-            $('.gct-pagination.prev-next-pagination a').on('click', function(e) {
-                e.preventDefault();
-                
-                if ($(this).hasClass('disabled')) {
-                    return false;
-                }
-                
-                const $link = $(this);
-                const $container = $link.closest('.gct-blog-posts-container');
-                const postType = $container.data('post-type');
-                const postsPerPage = $container.data('posts-per-page');
-                const page = $link.data('page');
-                let categoryId = 'all';
-                let taxonomy = 'category';
-                
-                // Get current category if set
-                const $select = $container.find('.gct-category-select');
-                if ($select.length) {
-                    categoryId = $select.val();
-                    taxonomy = $select.data('taxonomy');
-                }
-                
-                // Get and replace posts with filtered ones
-                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, false);
-            });
-            
-            // Helper function to get filtered posts
-            function getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, append = false) {
-                const $postsWrapper = $container.find('.gct-posts-wrapper');
-                const paginationType = $('.pagination-btn.active').data('pagination-type');
-                
-                // Add loading state
-                if (paginationType === 'load_more') {
-                    const $loadMoreButton = $container.find('.gct-load-more');
-                    if ($loadMoreButton.length) {
-                        $loadMoreButton.text('Loading...').addClass('loading');
-                    }
-                }
-                
-                // Get module settings from data attribute to maintain consistency
-                let moduleSettings = $container.data('module-settings');
-                
-                const data = {
-                    action: 'gct_get_filtered_posts',
-                    nonce: gct_blog_posts_params.nonce,
-                    post_type: postType,
-                    taxonomy: taxonomy,
-                    category_id: categoryId,
-                    posts_per_page: postsPerPage,
-                    page: page,
-                    module_settings: moduleSettings
-                };
-                
-                $.ajax({
-                    url: gct_blog_posts_params.ajaxurl,
-                    type: 'POST',
-                    data: data,
-                    success: function(response) {
-                        if (response.success) {
-                            // If we're appending posts (See more button)
-                            if (append) {
-                                // Extract the posts from the HTML response
-                                const $newContent = $(response.data.html);
-                                const $newPosts = $newContent.find('.gct-post-item');
-                                
-                                // Append the new posts to the existing grid
-                                $container.find('.gct-blog-posts-grid').append($newPosts);
-                                
-                                // Check if there's pagination in the response
-                                const $newPagination = $newContent.find('.gct-pagination');
-                                
-                                // If there's no pagination in the response, remove the existing pagination
-                                // This means we've loaded all posts
-                                if ($newPagination.length === 0) {
-                                    $container.find('.gct-pagination').remove();
-                                } else {
-                                    // Otherwise, replace the pagination (for updating the See more button)
-                                    $container.find('.gct-pagination').replaceWith($newPagination);
-                                }
-                            } else {
-                                // Replace the entire content (category change)
-                                $postsWrapper.html(response.data.html);
-                            }
-                        }
-                    }
-                });
-            }
         });
     </script>
 </body>

@@ -1,0 +1,272 @@
+/* 
+ * GCT Blog Posts Module Styles
+ * These styles complement the inline styles added in the module class
+ */
+
+/* Base font styles */
+.gct_blog_posts, 
+.gct-module-title,
+.gct-post-category,
+.gct-post-date,
+.gct-post-title,
+.gct-post-excerpt,
+.gct-category-filter label,
+.gct-category-filter select,
+.gct-load-more,
+.gct-no-posts {
+    font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif !important;
+}
+
+/* General container styling */
+.gct_blog_posts {
+    padding: 0 !important;
+    margin-bottom: 40px !important;
+}
+
+/* Module title styling */
+.gct-module-title {
+    text-align: start !important;
+    margin-bottom: 30px !important;
+    font-size: 32px !important;
+    color: #254B45 !important;
+    font-weight: 600 !important;
+}
+
+/* Category filter styling */
+.gct-category-filter {
+    margin-bottom: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+}
+
+.gct-category-filter label {
+    font-weight: normal !important;
+    font-size: 16px !important;
+    color: #000 !important;
+}
+
+.gct-category-filter select {
+    padding: 8px 30px 8px 12px !important;
+    background-color: #eee !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-size: 16px !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 16px !important;
+    min-width: 240px !important;
+    color: #000 !important;
+}
+
+/* Post grid styling */
+.gct-blog-posts-grid {
+    display: grid !important;
+    grid-gap: 30px !important;
+}
+
+.posts-per-row-1 {
+    grid-template-columns: repeat(1, 1fr) !important;
+}
+
+.posts-per-row-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.posts-per-row-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.posts-per-row-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+}
+
+/* Post item styling */
+.gct-post-item {
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+.gct-post-item:hover .gct-post-title a, 
+.gct-post-item:hover .gct-post-category {
+	color: #F7941C !important;
+}
+
+/* Top category styling */
+.gct-post-meta-top {
+    position: absolute !important;
+    top: 200px !important;
+    right: 10px !important;
+    z-index: 5 !important;
+}
+
+.gct-post-meta-top .gct-post-category {
+    display: inline-block !important;
+    padding: 5px 10px !important;
+    background-color: #fff !important;
+    color: #333 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 3px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+/* Thumbnail styling */
+.gct-post-thumbnail {
+    display: block !important;
+    position: relative !important;
+    height: 240px !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #f5f5f5 !important;
+}
+
+.gct-post-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.gct-post-thumbnail:hover .gct-post-overlay {
+    opacity: 1 !important;
+}
+
+/* Post content styling */
+.gct-post-content {
+    padding: 20px 0 !important;
+}
+
+.gct-post-meta {
+    margin-bottom: 10px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+
+.gct-post-category {
+    display: inline-block !important;
+    padding: 3px 8px !important;
+    background-color: #f0f0f0 !important;
+    color: #666 !important;
+    font-size: 12px !important;
+    border-radius: 3px !important;
+}
+
+.gct-post-date {
+    font-size: 14px !important;
+    color: #999 !important;
+}
+
+.gct-post-title {
+    margin-top: 0 !important;
+    margin-bottom: 15px !important;
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+}
+
+.gct-post-title a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.gct-post-excerpt {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    color: #666 !important;
+}
+
+/* Pagination and "See more" button styles */
+.gct-pagination {
+    margin-top: 40px !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.gct-load-more {
+    display: inline-block !important;
+    padding: 12px 35px !important;
+    background-color: #F6941C !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.gct-load-more:hover {
+    background-color: #244B45 !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15) !important;
+}
+
+.gct-load-more.loading {
+    background-color: #F6941C !important;
+    opacity: 0.8 !important;
+    color: #ffffff !important;
+    cursor: wait !important;
+    position: relative !important;
+}
+
+/* No posts found styling */
+.gct-no-posts {
+    text-align: center !important;
+    font-size: 16px !important;
+    padding: 20px !important;
+    color: #666 !important;
+}
+
+/* Responsive styles */
+@media (max-width: 980px) {
+    .gct-blog-posts-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .gct-blog-posts-grid {
+        grid-template-columns: repeat(1, 1fr) !important;
+    }
+}
+
+.gct-pagination {
+    justify-content: flex-start !important;
+}
+
+.gct-pagination a {
+    display: inline-block !important;
+    padding: 8px 16px !important;
+    margin: 0 5px !important; 
+    color: #666 !important;
+    background-color: #f0f0f0 !important;
+    text-decoration: none !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+}
+
+.gct-pagination a:hover {
+    background-color: #e0e0e0 !important;
+}
+
+.gct-pagination a.active {
+    background-color: #2ea3f2 !important;
+    color: #fff !important;
+}
+
+.gct-pagination a.active:hover {
+    background-color: #0c71c3 !important;
+} 
