@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCT Blog Posts Module Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/gct-blog-posts-module.css">
     <style>
         /* Preview styles to mimic WordPress/Divi environment */
         body {
@@ -42,6 +41,191 @@
         
         .gct_blog_posts {
             margin-bottom: 60px;
+        }
+        
+        /* Module styles */
+        .gct-module-title {
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        
+        .gct-blog-posts-grid {
+            display: grid;
+            grid-gap: 30px;
+        }
+        
+        .posts-per-row-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .posts-per-row-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .gct-post-item {
+            transition: all 0.3s ease;
+        }
+        
+        .gct-post-thumbnail {
+            display: block;
+            position: relative;
+            height: 240px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f5f5f5;
+        }
+        
+        .gct-post-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .gct-post-thumbnail:hover .gct-post-overlay {
+            opacity: 1;
+        }
+        
+        .et-pb-icon {
+            color: #ffffff;
+            font-size: 32px;
+        }
+        
+        .gct-post-content {
+            padding: 20px 0;
+        }
+        
+        .gct-post-meta {
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .gct-post-category {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #f0f0f0;
+            color: #666;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        
+        .gct-post-date {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .gct-post-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+            line-height: 1.3;
+        }
+        
+        .gct-post-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .gct-post-excerpt {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #666;
+        }
+        
+        .gct-category-filter {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .gct-category-filter label {
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        
+        .gct-category-filter select {
+            padding: 8px 30px 8px 12px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+        
+        .gct-pagination {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .gct-pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 5px;
+            color: #666;
+            background-color: #f0f0f0;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .gct-pagination a.active {
+            background-color: #2ea3f2;
+            color: #fff;
+        }
+        
+        .gct-pagination a:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .gct-pagination a.active:hover {
+            background-color: #0c71c3;
+        }
+        
+        .gct-load-more {
+            display: inline-block;
+            padding: 10px 30px;
+            background-color: #f0f0f0;
+            color: #666;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gct-load-more:hover {
+            background-color: #e0e0e0;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 980px) {
+            .gct-blog-posts-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .gct-blog-posts-grid {
+                grid-template-columns: repeat(1, 1fr) !important;
+            }
         }
         
         /* Divi icon font simulation */
@@ -124,17 +308,15 @@
                     <!-- Posts Grid -->
                     <div class="gct-blog-posts-grid posts-per-row-3">
                         <!-- Post 1 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=1');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Announcements</span>
-                                    </div>
+                                    <span class="gct-post-category">Announcements</span>
                                     <div class="gct-post-date">February 26, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">Official site name approved – Welcome to Harkness Memorial Park</a></h3>
@@ -143,17 +325,15 @@
                         </article>
                         
                         <!-- Post 2 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=2');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Operational updates</span>
-                                    </div>
+                                    <span class="gct-post-category">Operational updates</span>
                                     <div class="gct-post-date">March 26, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">New grave construction works underway at Keilor Cemetery</a></h3>
@@ -162,17 +342,15 @@
                         </article>
                         
                         <!-- Post 3 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=3');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Announcements</span>
-                                    </div>
+                                    <span class="gct-post-category">Announcements</span>
                                     <div class="gct-post-date">March 17, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">A tribute to David Cragg, former Trust member</a></h3>
@@ -181,17 +359,15 @@
                         </article>
                         
                         <!-- Post 4 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=4');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Operational updates</span>
-                                    </div>
+                                    <span class="gct-post-category">Operational updates</span>
                                     <div class="gct-post-date">January 12, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">Front entrance improvement works at Fawkner Memorial Park</a></h3>
@@ -200,17 +376,15 @@
                         </article>
                         
                         <!-- Post 5 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=5');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Announcements</span>
-                                    </div>
+                                    <span class="gct-post-category">Announcements</span>
                                     <div class="gct-post-date">December 5, 2024</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">Principal Design Consultant appointed for memorial park development in Harkness</a></h3>
@@ -219,17 +393,15 @@
                         </article>
                         
                         <!-- Post 6 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=6');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">General</span>
-                                    </div>
+                                    <span class="gct-post-category">General</span>
                                     <div class="gct-post-date">November 27, 2024</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">Thank you for attending our Annual Meeting</a></h3>
@@ -259,17 +431,15 @@
                     <!-- Posts Grid -->
                     <div class="gct-blog-posts-grid posts-per-row-2">
                         <!-- Post 1 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=7');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Events</span>
-                                    </div>
+                                    <span class="gct-post-category">Events</span>
                                     <div class="gct-post-date">April 15, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">Upcoming Memorial Service Events</a></h3>
@@ -278,17 +448,15 @@
                         </article>
                         
                         <!-- Post 2 -->
-                        <article class="gct-post-item item-visible">
+                        <article class="gct-post-item">
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=8');">
                                 <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
+                                    <!-- Removing the icon -->
                                 </div>
                             </a>
                             <div class="gct-post-content">
                                 <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">News</span>
-                                    </div>
+                                    <span class="gct-post-category">News</span>
                                     <div class="gct-post-date">April 5, 2025</div>
                                 </div>
                                 <h3 class="gct-post-title"><a href="#">New Community Garden Opening</a></h3>
@@ -304,91 +472,12 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Module Preview: Prev/Next Style -->
-        <div class="gct_blog_posts">
-            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="3">
-                <h2 class="gct-module-title">Recent Articles</h2>
-                
-                <div class="gct-posts-wrapper">
-                    <!-- Posts Grid -->
-                    <div class="gct-blog-posts-grid posts-per-row-3">
-                        <!-- Post 1 -->
-                        <article class="gct-post-item item-visible">
-                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=9');">
-                                <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
-                                </div>
-                            </a>
-                            <div class="gct-post-content">
-                                <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Updates</span>
-                                    </div>
-                                    <div class="gct-post-date">May 5, 2025</div>
-                                </div>
-                                <h3 class="gct-post-title"><a href="#">Summer Maintenance Update</a></h3>
-                                <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis.</div>
-                            </div>
-                        </article>
-                        
-                        <!-- Post 2 -->
-                        <article class="gct-post-item item-visible">
-                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=10');">
-                                <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
-                                </div>
-                            </a>
-                            <div class="gct-post-content">
-                                <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Events</span>
-                                    </div>
-                                    <div class="gct-post-date">May 12, 2025</div>
-                                </div>
-                                <h3 class="gct-post-title"><a href="#">Annual Memorial Day Service</a></h3>
-                                <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis.</div>
-                            </div>
-                        </article>
-                        
-                        <!-- Post 3 -->
-                        <article class="gct-post-item item-visible">
-                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=11');">
-                                <div class="gct-post-overlay">
-                                    <span class="et-pb-icon">&#xe089;</span>
-                                </div>
-                            </a>
-                            <div class="gct-post-content">
-                                <div class="gct-post-meta">
-                                    <div class="gct-post-categories">
-                                        <span class="gct-post-category">Community</span>
-                                    </div>
-                                    <div class="gct-post-date">May 18, 2025</div>
-                                </div>
-                                <h3 class="gct-post-title"><a href="#">Volunteer Opportunities Available</a></h3>
-                                <div class="gct-post-excerpt">Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean lacinia bibendum.</div>
-                            </div>
-                        </article>
-                    </div>
-                    
-                    <!-- Prev/Next Pagination -->
-                    <div class="gct-pagination">
-                        <a href="#" class="gct-prev-page" data-page="0">&laquo; Previous</a>
-                        <a href="#" class="gct-next-page" data-page="2">Next &raquo;</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- JavaScript to simulate module functionality -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/gct-blog-posts-module.js"></script>
     <script>
         $(document).ready(function() {
-            // Initialize the blog posts modules
-            initGCTBlogPostsModule();
-            
             // Responsive preview controls
             $('.view-btn').on('click', function() {
                 $('.view-btn').removeClass('active');
@@ -410,113 +499,42 @@
                 }
             });
             
-            // For preview purposes only - simulate AJAX responses
-            function initGCTBlogPostsModule() {
-                $('.gct-category-select').on('change', function() {
-                    const $select = $(this);
-                    const $container = $select.closest('.gct-blog-posts-container');
-                    const $postsWrapper = $container.find('.gct-posts-wrapper');
-                    const categoryId = $select.val();
+            // Simple category filter functionality
+            $('.gct-category-select').on('change', function() {
+                const categoryId = $(this).val();
+                const $items = $('.gct-post-item');
+                
+                if (categoryId === 'all') {
+                    $items.show();
+                } else {
+                    $items.hide();
                     
-                    // Simulate loading
-                    $postsWrapper.css('opacity', 0.5);
-                    
-                    // Simulate AJAX delay
-                    setTimeout(function() {
-                        // Filter posts based on selected category
-                        const $posts = $container.find('.gct-post-item');
-                        $posts.removeClass('item-visible');
+                    $items.each(function() {
+                        const category = $(this).find('.gct-post-category').text().trim();
                         
-                        if (categoryId === 'all') {
-                            $posts.addClass('item-visible');
-                        } else {
-                            $posts.each(function() {
-                                const $post = $(this);
-                                const $category = $post.find('.gct-post-category');
-                                
-                                if (categoryId === '1' && $category.text() === 'Announcements') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '2' && $category.text() === 'Operational updates') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '3' && $category.text() === 'General') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '4' && $category.text() === 'Events') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '5' && $category.text() === 'News') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '6' && $category.text() === 'Updates') {
-                                    $post.addClass('item-visible');
-                                } else if (categoryId === '7' && $category.text() === 'Community') {
-                                    $post.addClass('item-visible');
-                                }
-                            });
+                        if ((categoryId === '1' && category === 'Announcements') ||
+                            (categoryId === '2' && category === 'Operational updates') ||
+                            (categoryId === '3' && category === 'General') ||
+                            (categoryId === '4' && category === 'Events') ||
+                            (categoryId === '5' && category === 'News')) {
+                            $(this).show();
                         }
-                        
-                        // Restore opacity
-                        $postsWrapper.css('opacity', 1);
-                    }, 600);
-                });
+                    });
+                }
+            });
+            
+            // Simple pagination functionality
+            $('.gct-pagination a').on('click', function(e) {
+                e.preventDefault();
                 
-                // Handle pagination clicks
-                $('.gct-pagination a').on('click', function(e) {
-                    e.preventDefault();
-                    const $link = $(this);
-                    const $container = $link.closest('.gct-blog-posts-container');
-                    const $postsWrapper = $container.find('.gct-posts-wrapper');
-                    
-                    // Simulate loading
-                    $postsWrapper.css('opacity', 0.5);
-                    
-                    // Update active state for numbered pagination
-                    if ($link.hasClass('gct-page-number')) {
-                        $container.find('.gct-page-number').removeClass('active');
-                        $link.addClass('active');
-                    }
-                    
-                    // Scroll to top of container
-                    $('html, body').animate({
-                        scrollTop: $container.offset().top - 50
-                    }, 300);
-                    
-                    // Simulate AJAX loading delay
-                    setTimeout(function() {
-                        // Restore opacity
-                        $postsWrapper.css('opacity', 1);
-                        
-                        // For preview purposes, show a message
-                        alert('In a live environment, this would load page ' + $link.data('page') + ' via AJAX.');
-                    }, 600);
-                });
+                // Just for visual feedback
+                if ($(this).hasClass('gct-page-number')) {
+                    $('.gct-page-number').removeClass('active');
+                    $(this).addClass('active');
+                }
                 
-                // Handle image loading animation
-                $('.gct-post-thumbnail').each(function() {
-                    const $thumbnail = $(this);
-                    const bgImage = $thumbnail.css('background-image');
-                    
-                    if (bgImage && bgImage !== 'none') {
-                        const url = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
-                        
-                        if (url && url[1]) {
-                            const img = new Image();
-                            img.onload = function() {
-                                $thumbnail.addClass('image-loaded');
-                            };
-                            img.src = url[1];
-                        }
-                    } else {
-                        $thumbnail.addClass('no-image');
-                    }
-                });
-                
-                // Add staggered animation for posts
-                $('.gct-post-item').each(function(index) {
-                    const $item = $(this);
-                    
-                    setTimeout(function() {
-                        $item.addClass('item-visible');
-                    }, index * 100);
-                });
-            }
+                alert('In a live environment, this would load the next page of posts.');
+            });
         });
     </script>
 </body>

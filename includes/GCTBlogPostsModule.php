@@ -191,13 +191,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 'default'         => 'rgba(0,0,0,0.6)',
                 'toggle_slug'     => 'overlay',
             ),
-            'overlay_icon' => array(
-                'label'           => esc_html__('Overlay Icon', 'gct-blog-posts-module'),
-                'type'            => 'select_icon',
-                'option_category' => 'configuration',
-                'default'         => 'e',
-                'toggle_slug'     => 'overlay',
-            ),
         );
     }
     
@@ -473,12 +466,10 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 $output .= sprintf(
                     '<a href="%1$s" class="gct-post-thumbnail" %2$s>
                         <div class="gct-post-overlay">
-                            <span class="et-pb-icon">%3$s</span>
                         </div>
                     </a>',
                     esc_url(get_permalink()),
-                    $thumbnail_style,
-                    esc_attr($this->props['overlay_icon'])
+                    $thumbnail_style
                 );
                 
                 // Post content
@@ -597,15 +588,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-thumbnail:hover .gct-post-overlay',
             'declaration' => 'opacity: 1;',
-        ));
-        
-        // Overlay icon
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-overlay .et-pb-icon',
-            'declaration' => '
-                color: #ffffff;
-                font-size: 32px;
-            ',
         ));
         
         // Post content
