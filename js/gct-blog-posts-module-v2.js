@@ -162,6 +162,33 @@
                         const $newContent = $(response.data.html);
                         const $newPosts = $newContent.find('.gct-post-item');
                         
+                        // Ensure new posts have the correct structure and styling before appending
+                        $newPosts.each(function() {
+                            const $post = $(this);
+                            
+                            // Make sure overlay has the correct structure
+                            const $thumbnail = $post.find('.gct-post-thumbnail');
+                            const $overlay = $thumbnail.find('.gct-post-overlay');
+                            
+                            // If overlay is missing or malformed, recreate it
+                            if ($overlay.length === 0) {
+                                $thumbnail.append('<div class="gct-post-overlay"></div>');
+                            }
+                            
+                            // Ensure category tag has correct positioning
+                            const $metaTop = $post.find('.gct-post-meta-top');
+                            if ($metaTop.length && !$metaTop.is(':visible')) {
+                                $metaTop.css('display', 'block');
+                            }
+                            
+                            // Ensure metadata is properly displayed
+                            const $postContent = $post.find('.gct-post-content');
+                            const $meta = $postContent.find('.gct-post-meta');
+                            if ($meta.length === 0) {
+                                $postContent.prepend('<div class="gct-post-meta"></div>');
+                            }
+                        });
+                        
                         // Preserve module settings for show/hide elements
                         if (moduleSettings) {
                             const settings = typeof moduleSettings === 'string' 
@@ -193,6 +220,20 @@
                     } else {
                         // Replace the entire content but preserve module settings
                         $postsWrapper.html(response.data.html);
+                        
+                        // Ensure all posts in the new content have proper structure
+                        $postsWrapper.find('.gct-post-item').each(function() {
+                            const $post = $(this);
+                            
+                            // Make sure overlay has the correct structure
+                            const $thumbnail = $post.find('.gct-post-thumbnail');
+                            const $overlay = $thumbnail.find('.gct-post-overlay');
+                            
+                            // If overlay is missing or malformed, recreate it
+                            if ($overlay.length === 0) {
+                                $thumbnail.append('<div class="gct-post-overlay"></div>');
+                            }
+                        });
                         
                         // Apply module settings after content refresh
                         if (moduleSettings) {
