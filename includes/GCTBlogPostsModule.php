@@ -515,6 +515,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
      * Add custom styles
      */
     public function add_custom_styles($render_slug) {
+        // Base font styles
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%%, %%order_class%% .gct-module-title, %%order_class%% .gct-post-category, %%order_class%% .gct-post-date, %%order_class%% .gct-post-title, %%order_class%% .gct-post-excerpt, %%order_class%% .gct-category-filter label, %%order_class%% .gct-category-filter select, %%order_class%% .gct-load-more, %%order_class%% .gct-no-posts',
+            'declaration' => 'font-family: \'Libre Franklin\', Helvetica, Arial, Lucida, sans-serif;',
+        ));
+        
         // Grid layout
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-blog-posts-grid',
@@ -713,13 +719,19 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Load more button
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-load-more',
-            'declaration' => 'display: inline-block; padding: 10px 30px; background-color: #f0f0f0; color: #666; text-decoration: none; border-radius: 4px; transition: all 0.3s ease; cursor: pointer;',
+            'declaration' => 'display: inline-block; padding: 12px 35px; background-color: #F6941C; color: #ffffff; text-decoration: none; border-radius: 4px; transition: all 0.3s ease; cursor: pointer; font-weight: 600; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);',
         ));
         
         // Load more button hover
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-load-more:hover',
-            'declaration' => 'background-color: #e0e0e0;',
+            'declaration' => 'background-color: #244B45; color: #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15);',
+        ));
+        
+        // Load more button loading state
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-load-more.loading',
+            'declaration' => 'background-color: #F6941C; opacity: 0.8; color: #ffffff; cursor: wait;',
         ));
     }
 }

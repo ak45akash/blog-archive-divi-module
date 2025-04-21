@@ -3,6 +3,20 @@
  * These styles complement the inline styles added in the module class
  */
 
+/* Base font styles */
+.gct_blog_posts, 
+.gct-module-title,
+.gct-post-category,
+.gct-post-date,
+.gct-post-title,
+.gct-post-excerpt,
+.gct-category-filter label,
+.gct-category-filter select,
+.gct-load-more,
+.gct-no-posts {
+    font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
+}
+
 /* General container styling */
 .gct_blog_posts {
     padding: 0;
@@ -67,8 +81,8 @@
 /* Top category styling */
 .gct-post-meta-top {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 200px;
+    right: 10px;
     z-index: 5;
 }
 
@@ -166,11 +180,11 @@
 .gct-load-more {
     display: inline-block;
     padding: 12px 35px;
-    background-color: #f0f0f0;
-    color: #666;
+    background-color: #F6941C;
+    color: #ffffff;
     text-decoration: none;
     border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     cursor: pointer;
     font-weight: 600;
     font-size: 16px;
@@ -178,13 +192,15 @@
 }
 
 .gct-load-more:hover {
-    background-color: #e0e0e0;
+    background-color: #244B45;
+    color: #ffffff;
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
 .gct-load-more.loading {
-    background-color: #eaeaea;
-    color: #999;
+    background-color: #F6941C;
+    opacity: 0.8;
+    color: #ffffff;
     cursor: wait;
     position: relative;
 }
