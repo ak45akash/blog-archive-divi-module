@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCT Blog Posts Module Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/gct-blog-posts-module.css">
     <style>
         /* Preview styles to mimic WordPress/Divi environment */
         body {
@@ -312,6 +313,91 @@
             color: white;
             border-color: #2ea3f2;
         }
+
+        /* Style for the pagination types selector */
+        .pagination-type-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .pagination-type-selector button {
+            padding: 6px 12px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-type-selector button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .pagination-type-selector button.active {
+            background-color: #2ea3f2;
+            color: white;
+            border-color: #2ea3f2;
+        }
+
+        /* Numbered pagination styles */
+        .gct-pagination.numbers-pagination {
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .gct-pagination.numbers-pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 5px;
+            color: #666;
+            background-color: #f0f0f0;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .gct-pagination.numbers-pagination a.active {
+            background-color: #2ea3f2;
+            color: #fff;
+        }
+
+        .gct-pagination.numbers-pagination a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .gct-pagination.numbers-pagination a.active:hover {
+            background-color: #0c71c3;
+        }
+
+        /* Prev/Next pagination styles */
+        .gct-pagination.prev-next-pagination {
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .gct-pagination.prev-next-pagination a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            color: #666;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .gct-pagination.prev-next-pagination a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .gct-pagination.prev-next-pagination a.disabled {
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -327,9 +413,15 @@
             <button class="view-btn" data-width="mobile">Mobile</button>
         </div>
         
+        <div class="pagination-type-selector">
+            <button class="pagination-btn active" data-pagination-type="load_more">Load More</button>
+            <button class="pagination-btn" data-pagination-type="numbers">Numbers</button>
+            <button class="pagination-btn" data-pagination-type="prev_next">Prev/Next</button>
+        </div>
+        
         <!-- Module Preview -->
         <div class="gct_blog_posts">
-            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6">
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6" data-module-settings='{"show_category": "on", "show_date": "on", "show_excerpt": "on", "pagination_type": "load_more", "load_more_text": "See more"}'>
                 <h2 class="gct-module-title">Latest News</h2>
                 
                 <!-- Category Filter -->
@@ -471,56 +563,64 @@
         
         <hr>
         
-        <!-- Module Preview: Load More Button Style -->
-        <div class="gct_blog_posts">
-            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="2">
-                <h2 class="gct-module-title">Featured Posts</h2>
+        <!-- Module Preview with Numbered Pagination (initially hidden) -->
+        <div class="gct_blog_posts" style="display: none;" id="numbers-pagination-example">
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6" data-module-settings='{"show_category": "on", "show_date": "on", "show_excerpt": "on", "pagination_type": "numbers"}'>
+                <h2 class="gct-module-title">Blog Posts with Numbered Pagination</h2>
+                
+                <!-- Category Filter -->
+                <div class="gct-category-filter">
+                    <label>Category</label>
+                    <select class="gct-category-select" data-taxonomy="category">
+                        <option value="all">All Categories</option>
+                        <option value="1">Announcements</option>
+                        <option value="2">Operational updates</option>
+                        <option value="3">General</option>
+                    </select>
+                </div>
                 
                 <div class="gct-posts-wrapper">
-                    <!-- Posts Grid -->
-                    <div class="gct-blog-posts-grid posts-per-row-2">
-                        <!-- Post 1 -->
-                        <article class="gct-post-item">
-                            <div class="gct-post-meta-top">
-                                <span class="gct-post-category">Events</span>
-                            </div>
-                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=7');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
-                            </a>
-                            <div class="gct-post-content">
-                                <div class="gct-post-meta">
-                                    <div class="gct-post-date">April 15, 2025</div>
-                                </div>
-                                <h3 class="gct-post-title"><a href="#">Upcoming Memorial Service Events</a></h3>
-                                <div class="gct-post-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</div>
-                            </div>
-                        </article>
-                        
-                        <!-- Post 2 -->
-                        <article class="gct-post-item">
-                            <div class="gct-post-meta-top">
-                                <span class="gct-post-category">News</span>
-                            </div>
-                            <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=8');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
-                            </a>
-                            <div class="gct-post-content">
-                                <div class="gct-post-meta">
-                                    <div class="gct-post-date">April 5, 2025</div>
-                                </div>
-                                <h3 class="gct-post-title"><a href="#">New Community Garden Opening</a></h3>
-                                <div class="gct-post-excerpt">Nulla vitae elit libero, a pharetra augue. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</div>
-                            </div>
-                        </article>
+                    <!-- Posts Grid (same posts as above) -->
+                    <div class="gct-blog-posts-grid posts-per-row-3">
+                        <!-- Post content will be cloned from the first example -->
                     </div>
                     
-                    <!-- Pagination -->
-                    <div class="gct-pagination">
-                        <a href="#" class="gct-load-more" data-page="2">See more</a>
+                    <!-- Numbered Pagination -->
+                    <div class="gct-pagination numbers-pagination">
+                        <a href="#" class="active" data-page="1">1</a>
+                        <a href="#" data-page="2">2</a>
+                        <a href="#" data-page="3">3</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Module Preview with Prev/Next Pagination (initially hidden) -->
+        <div class="gct_blog_posts" style="display: none;" id="prev-next-pagination-example">
+            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6" data-module-settings='{"show_category": "on", "show_date": "on", "show_excerpt": "on", "pagination_type": "prev_next"}'>
+                <h2 class="gct-module-title">Blog Posts with Prev/Next Pagination</h2>
+                
+                <!-- Category Filter -->
+                <div class="gct-category-filter">
+                    <label>Category</label>
+                    <select class="gct-category-select" data-taxonomy="category">
+                        <option value="all">All Categories</option>
+                        <option value="1">Announcements</option>
+                        <option value="2">Operational updates</option>
+                        <option value="3">General</option>
+                    </select>
+                </div>
+                
+                <div class="gct-posts-wrapper">
+                    <!-- Posts Grid (same posts as above) -->
+                    <div class="gct-blog-posts-grid posts-per-row-3">
+                        <!-- Post content will be cloned from the first example -->
+                    </div>
+                    
+                    <!-- Prev/Next Pagination -->
+                    <div class="gct-pagination prev-next-pagination">
+                        <a href="#" class="gct-pagination-prev disabled" data-page="0">← Previous</a>
+                        <a href="#" class="gct-pagination-next" data-page="2">Next →</a>
                     </div>
                 </div>
             </div>
@@ -530,7 +630,20 @@
     <!-- JavaScript to simulate module functionality -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // Create a mock version of the WordPress AJAX parameters
+        var gct_blog_posts_params = {
+            ajaxurl: '#',
+            nonce: 'preview-nonce'
+        };
+    </script>
+    <script src="js/gct-blog-posts-module.js"></script>
+    <script>
         $(document).ready(function() {
+            // Clone posts to other examples
+            const originalPosts = $('.gct_blog_posts:first-child .gct-post-item').clone();
+            $('#numbers-pagination-example .gct-blog-posts-grid').html(originalPosts);
+            $('#prev-next-pagination-example .gct-blog-posts-grid').html(originalPosts.clone());
+            
             // Responsive preview controls
             $('.view-btn').on('click', function() {
                 $('.view-btn').removeClass('active');
@@ -552,96 +665,231 @@
                 }
             });
             
-            // "See more" button functionality
-            $('.gct-load-more').on('click', function(e) {
-                e.preventDefault();
+            // Pagination type selector
+            $('.pagination-btn').on('click', function() {
+                $('.pagination-btn').removeClass('active');
+                $(this).addClass('active');
                 
-                const $button = $(this);
-                const $container = $button.closest('.gct-blog-posts-container');
-                const $grid = $container.find('.gct-blog-posts-grid');
+                const paginationType = $(this).data('pagination-type');
                 
-                // Simulate loading
-                $button.text('Loading...').addClass('loading');
+                // Hide all examples and show the selected one
+                $('.gct_blog_posts').hide();
                 
-                // Simulate AJAX delay
+                if (paginationType === 'load_more') {
+                    $('.gct_blog_posts:first-child').show();
+                } else if (paginationType === 'numbers') {
+                    $('#numbers-pagination-example').show();
+                } else if (paginationType === 'prev_next') {
+                    $('#prev-next-pagination-example').show();
+                }
+            });
+            
+            // Override the AJAX functionality for preview purposes
+            $.ajax = function(options) {
+                // Simulate successful AJAX response with a delay
                 setTimeout(function() {
-                    // Get sample post HTML from the existing posts
-                    let newPostsHTML = '';
-                    const postsPerRow = $grid.hasClass('posts-per-row-3') ? 3 : 2;
-                    const samplePosts = $grid.find('.gct-post-item');
+                    const paginationType = $('.pagination-btn.active').data('pagination-type');
+                    const data = options.data;
+                    const categoryId = data.category_id;
+                    const page = data.page;
                     
-                    // Clone a few sample posts with different images
-                    for (let i = 0; i < postsPerRow; i++) {
-                        const randomPost = Math.floor(Math.random() * samplePosts.length);
-                        const $clonedPost = $(samplePosts[randomPost]).clone();
+                    // Generate sample posts HTML
+                    let postsHTML = '';
+                    
+                    // Create a different number of posts based on category selection to simulate filtering
+                    let postsCount = 6;
+                    
+                    if (categoryId !== 'all') {
+                        // Simulate fewer posts for specific categories
+                        if (categoryId === '3') { // General category
+                            postsCount = 2;
+                        } else if (categoryId === '2') { // Operational updates
+                            postsCount = 3;
+                        }
+                    }
+                    
+                    // Clone and modify posts for the response
+                    const $existingPosts = $('.gct-post-item');
+                    for (let i = 0; i < postsCount; i++) {
+                        const randomPost = Math.floor(Math.random() * $existingPosts.length);
+                        const $clonedPost = $($existingPosts[randomPost]).clone();
                         
                         // Update image to be unique
                         const randomNum = Math.floor(Math.random() * 100) + 20;
                         $clonedPost.find('.gct-post-thumbnail').css('background-image', 'url(https://picsum.photos/600/400?random=' + randomNum + ')');
                         
-                        // Randomly change category for more variety
-                        const categories = ['Announcements', 'Operational updates', 'General', 'Events', 'News'];
-                        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                        $clonedPost.find('.gct-post-meta-top .gct-post-category').text(randomCategory);
+                        // If category is selected, make sure posts match that category
+                        if (categoryId !== 'all') {
+                            let categoryName;
+                            switch(categoryId) {
+                                case '1': categoryName = 'Announcements'; break;
+                                case '2': categoryName = 'Operational updates'; break;
+                                case '3': categoryName = 'General'; break;
+                                default: categoryName = 'Announcements';
+                            }
+                            $clonedPost.find('.gct-post-meta-top .gct-post-category').text(categoryName);
+                        }
                         
-                        // Add to new posts
-                        newPostsHTML += $clonedPost[0].outerHTML;
+                        postsHTML += $clonedPost[0].outerHTML;
                     }
                     
-                    // Append new posts
-                    $grid.append(newPostsHTML);
+                    // Create a full HTML structure including pagination
+                    let responseHTML = '<div class="gct-blog-posts-grid posts-per-row-3">' + postsHTML + '</div>';
                     
-                    // Simulate reaching the end after a few clicks
-                    const currentPage = parseInt($button.data('page'));
-                    if (currentPage >= 3) {
-                        $button.parent().remove(); // Remove pagination completely when no more posts
-                    } else {
-                        $button.data('page', currentPage + 1)
-                               .removeClass('loading')
-                               .text('See more');
+                    // Add appropriate pagination based on type
+                    if (paginationType === 'load_more') {
+                        // Only add "See more" button if not at final page
+                        if (page < 3) {
+                            responseHTML += '<div class="gct-pagination"><a href="#" class="gct-load-more" data-page="' + (page + 1) + '">See more</a></div>';
+                        } else {
+                            responseHTML += '<div class="gct-pagination"></div>';
+                        }
+                    } else if (paginationType === 'numbers') {
+                        responseHTML += '<div class="gct-pagination numbers-pagination">';
+                        for (let i = 1; i <= 3; i++) {
+                            const activeClass = (i === page) ? 'active' : '';
+                            responseHTML += '<a href="#" class="' + activeClass + '" data-page="' + i + '">' + i + '</a>';
+                        }
+                        responseHTML += '</div>';
+                    } else if (paginationType === 'prev_next') {
+                        responseHTML += '<div class="gct-pagination prev-next-pagination">';
+                        
+                        // Prev button, disabled if on first page
+                        const prevDisabled = (page <= 1) ? 'disabled' : '';
+                        responseHTML += '<a href="#" class="gct-pagination-prev ' + prevDisabled + '" data-page="' + (page - 1) + '">← Previous</a>';
+                        
+                        // Next button, disabled if on last page
+                        const nextDisabled = (page >= 3) ? 'disabled' : '';
+                        responseHTML += '<a href="#" class="gct-pagination-next ' + nextDisabled + '" data-page="' + (page + 1) + '">Next →</a>';
+                        
+                        responseHTML += '</div>';
+                    }
+                    
+                    // Call the success callback with our simulated response
+                    if (options.success) {
+                        options.success({
+                            success: true,
+                            data: {
+                                html: responseHTML
+                            }
+                        });
                     }
                 }, 1000);
+            };
+            
+            // Initialize the module functionality
+            initGCTBlogPostsModule();
+            
+            // Extend the module functionality for the pagination examples
+            $('.gct-pagination.numbers-pagination a').on('click', function(e) {
+                e.preventDefault();
+                
+                const $link = $(this);
+                const $container = $link.closest('.gct-blog-posts-container');
+                const postType = $container.data('post-type');
+                const postsPerPage = $container.data('posts-per-page');
+                const page = $link.data('page');
+                let categoryId = 'all';
+                let taxonomy = 'category';
+                
+                // Get current category if set
+                const $select = $container.find('.gct-category-select');
+                if ($select.length) {
+                    categoryId = $select.val();
+                    taxonomy = $select.data('taxonomy');
+                }
+                
+                // Get and replace posts with filtered ones
+                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, false);
             });
             
-            // Simulate the initial state for categories with few posts
-            $('.gct-category-select').on('change', function() {
-                const categoryId = $(this).val();
-                const $items = $('.gct-post-item');
-                const $container = $(this).closest('.gct-blog-posts-container');
-                const $pagination = $container.find('.gct-pagination');
+            $('.gct-pagination.prev-next-pagination a').on('click', function(e) {
+                e.preventDefault();
                 
-                if (categoryId === 'all') {
-                    $items.show();
-                    // Show pagination again for all posts
-                    $pagination.show();
-                } else {
-                    $items.hide();
-                    
-                    // Count how many items will be displayed for this category
-                    let visibleCount = 0;
-                    
-                    $items.each(function() {
-                        const category = $(this).find('.gct-post-category').text().trim();
-                        
-                        if ((categoryId === '1' && category === 'Announcements') ||
-                            (categoryId === '2' && category === 'Operational updates') ||
-                            (categoryId === '3' && category === 'General') ||
-                            (categoryId === '4' && category === 'Events') ||
-                            (categoryId === '5' && category === 'News')) {
-                            $(this).show();
-                            visibleCount++;
-                        }
-                    });
-                    
-                    // Hide pagination if there are few posts (simulating fewer posts than per page)
-                    // For demonstration purposes, hide if fewer than 3 posts
-                    if (visibleCount <= 3) {
-                        $pagination.hide();
-                    } else {
-                        $pagination.show();
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
+                
+                const $link = $(this);
+                const $container = $link.closest('.gct-blog-posts-container');
+                const postType = $container.data('post-type');
+                const postsPerPage = $container.data('posts-per-page');
+                const page = $link.data('page');
+                let categoryId = 'all';
+                let taxonomy = 'category';
+                
+                // Get current category if set
+                const $select = $container.find('.gct-category-select');
+                if ($select.length) {
+                    categoryId = $select.val();
+                    taxonomy = $select.data('taxonomy');
+                }
+                
+                // Get and replace posts with filtered ones
+                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, false);
+            });
+            
+            // Helper function to get filtered posts
+            function getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, append = false) {
+                const $postsWrapper = $container.find('.gct-posts-wrapper');
+                const paginationType = $('.pagination-btn.active').data('pagination-type');
+                
+                // Add loading state
+                if (paginationType === 'load_more') {
+                    const $loadMoreButton = $container.find('.gct-load-more');
+                    if ($loadMoreButton.length) {
+                        $loadMoreButton.text('Loading...').addClass('loading');
                     }
                 }
-            });
+                
+                // Get module settings from data attribute to maintain consistency
+                let moduleSettings = $container.data('module-settings');
+                
+                const data = {
+                    action: 'gct_get_filtered_posts',
+                    nonce: gct_blog_posts_params.nonce,
+                    post_type: postType,
+                    taxonomy: taxonomy,
+                    category_id: categoryId,
+                    posts_per_page: postsPerPage,
+                    page: page,
+                    module_settings: moduleSettings
+                };
+                
+                $.ajax({
+                    url: gct_blog_posts_params.ajaxurl,
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        if (response.success) {
+                            // If we're appending posts (See more button)
+                            if (append) {
+                                // Extract the posts from the HTML response
+                                const $newContent = $(response.data.html);
+                                const $newPosts = $newContent.find('.gct-post-item');
+                                
+                                // Append the new posts to the existing grid
+                                $container.find('.gct-blog-posts-grid').append($newPosts);
+                                
+                                // Check if there's pagination in the response
+                                const $newPagination = $newContent.find('.gct-pagination');
+                                
+                                // If there's no pagination in the response, remove the existing pagination
+                                // This means we've loaded all posts
+                                if ($newPagination.length === 0) {
+                                    $container.find('.gct-pagination').remove();
+                                } else {
+                                    // Otherwise, replace the pagination (for updating the See more button)
+                                    $container.find('.gct-pagination').replaceWith($newPagination);
+                                }
+                            } else {
+                                // Replace the entire content (category change)
+                                $postsWrapper.html(response.data.html);
+                            }
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>
