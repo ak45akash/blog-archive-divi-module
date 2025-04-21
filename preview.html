@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCT Blog Posts Module Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/gct-blog-posts-module-v2.css">
+    <link rel="stylesheet" href="css/gct-blog-posts-module.css">
     <style>
         /* Preview-specific styles only */
         body {
@@ -93,34 +93,6 @@
             color: white;
             border-color: #2ea3f2;
         }
-        
-        /* Style for the pagination types selector */
-        .pagination-type-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .pagination-type-selector button {
-            padding: 6px 12px;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .pagination-type-selector button:hover {
-            background-color: #e0e0e0;
-        }
-
-        .pagination-type-selector button.active {
-            background-color: #2ea3f2;
-            color: white;
-            border-color: #2ea3f2;
-        }
     </style>
 </head>
 <body>
@@ -134,12 +106,6 @@
             <button class="view-btn active" data-width="desktop">Desktop</button>
             <button class="view-btn" data-width="tablet">Tablet</button>
             <button class="view-btn" data-width="mobile">Mobile</button>
-        </div>
-        
-        <div class="pagination-type-selector">
-            <button class="pagination-btn active" data-pagination-type="load_more">Load More</button>
-            <button class="pagination-btn" data-pagination-type="numbers">Numbers</button>
-            <button class="pagination-btn" data-pagination-type="prev_next">Prev/Next</button>
         </div>
         
         <!-- Module Preview -->
@@ -285,69 +251,6 @@
         </div>
         
         <hr>
-        
-        <!-- Module Preview with Numbered Pagination (initially hidden) -->
-        <div class="gct_blog_posts" style="display: none;" id="numbers-pagination-example">
-            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6" data-module-settings='{"show_category": "on", "show_date": "on", "show_excerpt": "on", "pagination_type": "numbers"}'>
-                <h2 class="gct-module-title">Blog Posts with Numbered Pagination</h2>
-                
-                <!-- Category Filter -->
-                <div class="gct-category-filter">
-                    <label>Category</label>
-                    <select class="gct-category-select" data-taxonomy="category">
-                        <option value="all">All Categories</option>
-                        <option value="1">Announcements</option>
-                        <option value="2">Operational updates</option>
-                        <option value="3">General</option>
-                    </select>
-                </div>
-                
-                <div class="gct-posts-wrapper">
-                    <!-- Posts Grid (same posts as above) -->
-                    <div class="gct-blog-posts-grid posts-per-row-3">
-                        <!-- Post content will be cloned from the first example -->
-                    </div>
-                    
-                    <!-- Numbered Pagination -->
-                    <div class="gct-pagination">
-                        <a href="#" class="active" data-page="1">1</a>
-                        <a href="#" data-page="2">2</a>
-                        <a href="#" data-page="3">3</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Module Preview with Prev/Next Pagination (initially hidden) -->
-        <div class="gct_blog_posts" style="display: none;" id="prev-next-pagination-example">
-            <div class="gct-blog-posts-container" data-post-type="post" data-posts-per-page="6" data-module-settings='{"show_category": "on", "show_date": "on", "show_excerpt": "on", "pagination_type": "prev_next"}'>
-                <h2 class="gct-module-title">Blog Posts with Prev/Next Pagination</h2>
-                
-                <!-- Category Filter -->
-                <div class="gct-category-filter">
-                    <label>Category</label>
-                    <select class="gct-category-select" data-taxonomy="category">
-                        <option value="all">All Categories</option>
-                        <option value="1">Announcements</option>
-                        <option value="2">Operational updates</option>
-                        <option value="3">General</option>
-                    </select>
-                </div>
-                
-                <div class="gct-posts-wrapper">
-                    <!-- Posts Grid (same posts as above) -->
-                    <div class="gct-blog-posts-grid posts-per-row-3">
-                        <!-- Post content will be cloned from the first example -->
-                    </div>
-                    
-                    <!-- Prev/Next Pagination -->
-                    <div class="gct-pagination">
-                        <a href="#" class="gct-pagination-prev disabled" data-page="0">← Previous</a>
-                        <a href="#" class="gct-pagination-next" data-page="2">Next →</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- JavaScript to simulate module functionality -->
@@ -359,14 +262,9 @@
             nonce: 'preview-nonce'
         };
     </script>
-    <script src="js/gct-blog-posts-module-v2.js"></script>
+    <script src="js/gct-blog-posts-module.js"></script>
     <script>
         $(document).ready(function() {
-            // Clone posts to other examples
-            const originalPosts = $('.gct_blog_posts:first-child .gct-post-item').clone();
-            $('#numbers-pagination-example .gct-blog-posts-grid').html(originalPosts);
-            $('#prev-next-pagination-example .gct-blog-posts-grid').html(originalPosts.clone());
-            
             // Responsive preview controls
             $('.view-btn').on('click', function() {
                 $('.view-btn').removeClass('active');
@@ -388,30 +286,10 @@
                 }
             });
             
-            // Pagination type selector
-            $('.pagination-btn').on('click', function() {
-                $('.pagination-btn').removeClass('active');
-                $(this).addClass('active');
-                
-                const paginationType = $(this).data('pagination-type');
-                
-                // Hide all examples and show the selected one
-                $('.gct_blog_posts').hide();
-                
-                if (paginationType === 'load_more') {
-                    $('.gct_blog_posts:first-child').show();
-                } else if (paginationType === 'numbers') {
-                    $('#numbers-pagination-example').show();
-                } else if (paginationType === 'prev_next') {
-                    $('#prev-next-pagination-example').show();
-                }
-            });
-            
             // Override the AJAX functionality for preview purposes
             $.ajax = function(options) {
                 // Simulate successful AJAX response with a delay
                 setTimeout(function() {
-                    const paginationType = $('.pagination-btn.active').data('pagination-type');
                     const data = options.data;
                     const categoryId = data.category_id;
                     const page = data.page;
@@ -460,39 +338,46 @@
                             $clonedPost.find('.gct-post-meta-top .gct-post-category').text(categoryName);
                         }
                         
+                        // Ensure that the post structure respects the module settings
+                        // Show/hide category
+                        if (settings && settings.show_category === 'off') {
+                            $clonedPost.find('.gct-post-meta-top').hide();
+                        } else {
+                            $clonedPost.find('.gct-post-meta-top').show();
+                        }
+                        
+                        // Show/hide date
+                        if (settings && settings.show_date === 'off') {
+                            $clonedPost.find('.gct-post-date').hide();
+                        } else {
+                            $clonedPost.find('.gct-post-date').show();
+                        }
+                        
+                        // Show/hide excerpt
+                        if (settings && settings.show_excerpt === 'off') {
+                            $clonedPost.find('.gct-post-excerpt').hide();
+                        } else {
+                            $clonedPost.find('.gct-post-excerpt').show();
+                        }
+                        
                         postsHTML += $clonedPost[0].outerHTML;
                     }
                     
                     // Create a full HTML structure including pagination
                     let responseHTML = '<div class="gct-blog-posts-grid posts-per-row-3">' + postsHTML + '</div>';
                     
-                    // Add appropriate pagination based on type
-                    if (paginationType === 'load_more') {
+                    // Get pagination type from settings or default to load_more
+                    const paginationType = settings && settings.pagination_type ? settings.pagination_type : 'load_more';
+                    const loadMoreText = settings && settings.load_more_text ? settings.load_more_text : 'See more';
+                    
+                    // Add appropriate pagination based on the pagination_type from module settings
+                    if (paginationType === 'load_more' || paginationType === '') {
                         // Only add "See more" button if not at final page
                         if (page < 3) {
-                            responseHTML += '<div class="gct-pagination"><a href="#" class="gct-load-more" data-page="' + (page + 1) + '">See more</a></div>';
+                            responseHTML += '<div class="gct-pagination"><a href="#" class="gct-load-more" data-page="' + (page + 1) + '">' + loadMoreText + '</a></div>';
                         } else {
                             responseHTML += '<div class="gct-pagination"></div>';
                         }
-                    } else if (paginationType === 'numbers') {
-                        responseHTML += '<div class="gct-pagination">';
-                        for (let i = 1; i <= 3; i++) {
-                            const activeClass = (i === page) ? 'active' : '';
-                            responseHTML += '<a href="#" class="' + activeClass + '" data-page="' + i + '">' + i + '</a>';
-                        }
-                        responseHTML += '</div>';
-                    } else if (paginationType === 'prev_next') {
-                        responseHTML += '<div class="gct-pagination">';
-                        
-                        // Prev button, disabled if on first page
-                        const prevDisabled = (page <= 1) ? 'disabled' : '';
-                        responseHTML += '<a href="#" class="gct-pagination-prev ' + prevDisabled + '" data-page="' + (page - 1) + '">← Previous</a>';
-                        
-                        // Next button, disabled if on last page
-                        const nextDisabled = (page >= 3) ? 'disabled' : '';
-                        responseHTML += '<a href="#" class="gct-pagination-next ' + nextDisabled + '" data-page="' + (page + 1) + '">Next →</a>';
-                        
-                        responseHTML += '</div>';
                     }
                     
                     // Call the success callback with our simulated response

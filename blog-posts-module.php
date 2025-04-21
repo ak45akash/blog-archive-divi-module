@@ -29,7 +29,7 @@ function gct_blog_posts_initialize_extension() {
         new GCT_BlogPostsModule();
         
         if (function_exists('et_builder_add_main_css')) {
-            et_builder_add_main_css('gct-blog-posts-module-style-v2', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module-v2.css');
+            et_builder_add_main_css('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css');
         }
     }
 }
@@ -63,12 +63,12 @@ add_action('admin_notices', 'gct_blog_posts_admin_notice_missing_divi');
  * Enqueue scripts and styles
  */
 function gct_blog_posts_enqueue_scripts() {
-    wp_enqueue_style('gct-blog-posts-module-style-v2', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module-v2.css', array(), GCT_BPM_VERSION);
-    wp_enqueue_script('gct-blog-posts-module-script-v2', GCT_BPM_PLUGIN_URL . 'js/gct-blog-posts-module-v2.js', array('jquery'), GCT_BPM_VERSION, true);
+    wp_enqueue_style('gct-blog-posts-module-style', GCT_BPM_PLUGIN_URL . 'css/gct-blog-posts-module.css', array(), GCT_BPM_VERSION);
+    wp_enqueue_script('gct-blog-posts-module-script', GCT_BPM_PLUGIN_URL . 'js/gct-blog-posts-module.js', array('jquery'), GCT_BPM_VERSION, true);
     
     // Localize script for AJAX pagination and filtering
     wp_localize_script(
-        'gct-blog-posts-module-script-v2',
+        'gct-blog-posts-module-script',
         'gct_blog_posts_params',
         array(
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -274,7 +274,6 @@ function gct_get_filtered_posts() {
             echo sprintf(
                 '<a href="%1$s" class="gct-post-thumbnail" %2$s>
                     <div class="gct-post-overlay">
-                        <span class="et-pb-icon">&#xe089;</span>
                     </div>
                 </a>',
                 esc_url(get_permalink()),
