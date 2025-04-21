@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCT Blog Posts Module Preview</title>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/gct-blog-posts-module.css">
+    <link rel="stylesheet" href="css/gct-blog-posts-module-v2.css">
     <style>
         /* Preview-specific styles only */
         body {
@@ -262,7 +262,7 @@
             nonce: 'preview-nonce'
         };
     </script>
-    <script src="js/gct-blog-posts-module.js"></script>
+    <script src="js/gct-blog-posts-module-v2.js"></script>
     <script>
         $(document).ready(function() {
             // Responsive preview controls
@@ -326,6 +326,11 @@
                         const randomNum = Math.floor(Math.random() * 100) + 20;
                         $clonedPost.find('.gct-post-thumbnail').css('background-image', 'url(https://picsum.photos/600/400?random=' + randomNum + ')');
                         
+                        // Make sure the post overlay is present
+                        if ($clonedPost.find('.gct-post-thumbnail .gct-post-overlay').length === 0) {
+                            $clonedPost.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
+                        }
+                        
                         // If category is selected, make sure posts match that category
                         if (categoryId !== 'all') {
                             let categoryName;
@@ -371,13 +376,34 @@
                     const loadMoreText = settings && settings.load_more_text ? settings.load_more_text : 'See more';
                     
                     // Add appropriate pagination based on the pagination_type from module settings
-                    if (paginationType === 'load_more' || paginationType === '') {
+                    if (paginationType === 'load_more') {
                         // Only add "See more" button if not at final page
                         if (page < 3) {
                             responseHTML += '<div class="gct-pagination"><a href="#" class="gct-load-more" data-page="' + (page + 1) + '">' + loadMoreText + '</a></div>';
                         } else {
                             responseHTML += '<div class="gct-pagination"></div>';
                         }
+                    } else if (paginationType === 'numbers') {
+                        // Add numbered pagination
+                        responseHTML += '<div class="gct-pagination">';
+                        for (let i = 1; i <= 3; i++) {
+                            const activeClass = (i === parseInt(page)) ? 'active' : '';
+                            responseHTML += '<a href="#" class="' + activeClass + '" data-page="' + i + '">' + i + '</a>';
+                        }
+                        responseHTML += '</div>';
+                    } else if (paginationType === 'prev_next') {
+                        // Add prev/next pagination
+                        responseHTML += '<div class="gct-pagination">';
+                        
+                        // Prev button
+                        const prevDisabled = (page <= 1) ? 'disabled' : '';
+                        responseHTML += '<a href="#" class="gct-pagination-prev ' + prevDisabled + '" data-page="' + (parseInt(page) - 1) + '">← Previous</a>';
+                        
+                        // Next button
+                        const nextDisabled = (page >= 3) ? 'disabled' : '';
+                        responseHTML += '<a href="#" class="gct-pagination-next ' + nextDisabled + '" data-page="' + (parseInt(page) + 1) + '">Next →</a>';
+                        
+                        responseHTML += '</div>';
                     }
                     
                     // Call the success callback with our simulated response
