@@ -48,6 +48,8 @@
             margin-bottom: 30px;
             font-size: 32px;
             font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
+            color: #000;
+            font-weight: 600;
         }
         
         .gct-blog-posts-grid {
@@ -79,7 +81,7 @@
             display: inline-block;
             padding: 5px 10px;
             background-color: #fff;
-            color: #333;
+            color: #244B45;
             font-size: 12px;
             font-weight: 600;
             border-radius: 3px;
@@ -155,7 +157,7 @@
         }
         
         .gct-post-title a {
-            color: inherit;
+            color: #244B45;
             text-decoration: none;
         }
         
@@ -169,35 +171,38 @@
         .gct-category-filter {
             margin-bottom: 30px;
             display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: flex-start;
             gap: 10px;
         }
         
         .gct-category-filter label {
-            margin-right: 10px;
-            font-weight: 600;
+            font-weight: normal;
+            font-size: 16px;
+            color: #000;
             font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
         }
         
         .gct-category-filter select {
             padding: 8px 30px 8px 12px;
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            background-color: #eee;
+            border: none;
+            border-radius: 0;
+            font-size: 16px;
             font-family: 'Libre Franklin', Helvetica, Arial, Lucida, sans-serif;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 10px center;
             background-size: 16px;
+            min-width: 240px;
+            color: #000;
         }
         
         .gct-pagination {
             margin-top: 40px;
             display: flex;
-            justify-content: center;
+            /* justify-content: center; */
             flex-wrap: wrap;
             gap: 5px;
         }
@@ -206,21 +211,16 @@
             display: inline-block;
             padding: 8px 16px;
             margin: 0 5px;
-            color: #666;
-            background-color: #f0f0f0;
             text-decoration: none;
             border-radius: 4px;
             transition: all 0.3s ease;
         }
         
-        .gct-pagination a.active {
+        /* .gct-pagination a.active {
             background-color: #2ea3f2;
             color: #fff;
-        }
+        } */
         
-        .gct-pagination a:hover {
-            background-color: #e0e0e0;
-        }
         
         .gct-pagination a.active:hover {
             background-color: #0c71c3;

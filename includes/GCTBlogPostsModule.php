@@ -665,25 +665,25 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Module title
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-module-title',
-            'declaration' => 'margin-bottom: 30px; font-size: 32px;',
+            'declaration' => 'margin-bottom: 30px; font-size: 32px; color: #000; font-weight: 600;',
         ));
         
         // Category filter
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-category-filter',
-            'declaration' => 'margin-bottom: 30px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;',
+            'declaration' => 'margin-bottom: 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;',
         ));
         
         // Category filter label
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-category-filter label',
-            'declaration' => 'margin-right: 10px; font-weight: 600;',
+            'declaration' => 'font-weight: normal; font-size: 16px; color: #000;',
         ));
         
         // Category filter select
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-category-filter select',
-            'declaration' => 'padding: 8px 30px 8px 12px; background-color: #f7f7f7; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' width=\'24\' height=\'24\'%3E%3Cpath fill=\'none\' d=\'M0 0h24v24H0z\'/%3E%3Cpath d=\'M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z\'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;',
+            'declaration' => 'padding: 8px 30px 8px 12px; background-color: #eee; border: none; border-radius: 0; font-size: 16px; color: #000; min-width: 240px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' width=\'24\' height=\'24\'%3E%3Cpath fill=\'none\' d=\'M0 0h24v24H0z\'/%3E%3Cpath d=\'M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z\'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;',
         ));
         
         // Pagination container
