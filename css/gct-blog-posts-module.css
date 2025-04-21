@@ -11,9 +11,11 @@
 
 /* Category filter styling */
 .gct-category-filter {
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
-    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .gct-category-filter label {
@@ -32,60 +34,112 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 16px;
-    min-width: 200px;
+}
+
+/* Post grid styling */
+.gct-blog-posts-grid {
+    display: grid;
+    grid-gap: 30px;
+}
+
+.posts-per-row-1 {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.posts-per-row-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.posts-per-row-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.posts-per-row-4 {
+    grid-template-columns: repeat(4, 1fr);
 }
 
 /* Post item styling */
 .gct-post-item {
-    position: relative;
-    overflow: hidden;
-    border-radius: 6px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: #fff;
-    opacity: 0;
-    transform: translateY(20px);
+    transition: all 0.3s ease;
 }
 
-/* Animation for items loaded via JavaScript */
-.gct-post-item.item-visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
-}
-
-.gct-post-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-/* Thumbnail hover effects */
+/* Thumbnail styling */
 .gct-post-thumbnail {
-    overflow: hidden;
+    display: block;
     position: relative;
+    height: 240px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #f5f5f5;
 }
 
-.gct-post-thumbnail::before {
-    content: '';
+.gct-post-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #f0f0f0;
-    z-index: 0;
-}
-
-.gct-post-thumbnail.image-loaded::before {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
-}
-
-.gct-post-thumbnail .gct-post-overlay {
-    transform: scale(1.1);
+    transition: opacity 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .gct-post-thumbnail:hover .gct-post-overlay {
-    transform: scale(1);
+    opacity: 1;
+}
+
+/* Icon styling */
+.et-pb-icon {
+    color: #ffffff;
+    font-size: 32px;
+}
+
+/* Post content styling */
+.gct-post-content {
+    padding: 20px 0;
+}
+
+.gct-post-meta {
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.gct-post-category {
+    display: inline-block;
+    padding: 3px 8px;
+    background-color: #f0f0f0;
+    color: #666;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.gct-post-date {
+    font-size: 14px;
+    color: #999;
+}
+
+.gct-post-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+.gct-post-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.gct-post-excerpt {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #666;
 }
 
 /* Pagination styles */
@@ -136,120 +190,29 @@
     background-color: #e0e0e0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 980px) {
-    .gct-post-title {
-        font-size: 18px !important;
-    }
-    
-    .gct-post-thumbnail {
-        height: 200px !important;
-    }
-    
-    .gct-category-filter {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .gct-category-filter label {
-        margin-bottom: 5px;
-    }
-    
-    .gct-category-filter select {
-        width: 100%;
-    }
-}
-
-@media (max-width: 767px) {
-    .gct-post-thumbnail {
-        height: 180px !important;
-    }
-    
-    .gct-pagination {
-        flex-wrap: wrap;
-    }
-    
-    .gct-pagination a {
-        margin: 0 2px 5px;
-    }
-}
-
-/* Overlay icon animation */
-.gct-post-overlay .et-pb-icon {
-    transform: scale(0.8);
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.gct-post-thumbnail:hover .gct-post-overlay .et-pb-icon {
-    transform: scale(1);
-    opacity: 1;
-}
-
 /* Module title styling */
 .gct-module-title {
-    position: relative;
-    padding-bottom: 10px;
-}
-
-.gct-module-title:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background-color: #333;
-}
-
-/* Post meta styling */
-.gct-post-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-/* Category tag hover effect */
-.gct-post-category {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.gct-post-category:hover {
-    background-color: #333 !important;
-    color: #fff !important;
-}
-
-/* Post title hover effect */
-.gct-post-title a {
-    transition: color 0.3s ease;
-}
-
-.gct-post-title a:hover {
-    color: #2ea3f2;
-}
-
-/* Animation classes */
-.gct-fade-in {
-    animation: gctFadeIn 0.5s ease forwards;
-}
-
-@keyframes gctFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    margin-bottom: 30px;
+    font-size: 32px;
 }
 
 /* No posts found styling */
 .gct-no-posts {
     text-align: center;
     font-size: 16px;
+    padding: 20px;
     color: #666;
-    padding: 30px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
+}
+
+/* Responsive styles */
+@media (max-width: 980px) {
+    .gct-blog-posts-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .gct-blog-posts-grid {
+        grid-template-columns: repeat(1, 1fr) !important;
+    }
 } 

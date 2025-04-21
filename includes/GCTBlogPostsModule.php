@@ -422,14 +422,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                     if ($post_type === 'post') {
                         $post_categories = get_the_category();
                         if (!empty($post_categories)) {
-                            $categories = '<div class="gct-post-categories">';
-                            foreach ($post_categories as $category) {
-                                $categories .= sprintf(
-                                    '<span class="gct-post-category">%1$s</span>',
-                                    esc_html($category->name)
-                                );
-                            }
-                            $categories .= '</div>';
+                            // Get only the first category
+                            $category = $post_categories[0];
+                            $categories = sprintf(
+                                '<span class="gct-post-category">%1$s</span>',
+                                esc_html($category->name)
+                            );
                         }
                     } else {
                         $taxonomies = get_object_taxonomies($post_type, 'objects');
@@ -437,14 +435,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                             $taxonomy = key($taxonomies);
                             $terms = get_the_terms(get_the_ID(), $taxonomy);
                             if (!empty($terms) && !is_wp_error($terms)) {
-                                $categories = '<div class="gct-post-categories">';
-                                foreach ($terms as $term) {
-                                    $categories .= sprintf(
-                                        '<span class="gct-post-category">%1$s</span>',
-                                        esc_html($term->name)
-                                    );
-                                }
-                                $categories .= '</div>';
+                                // Get only the first term
+                                $term = $terms[0];
+                                $categories = sprintf(
+                                    '<span class="gct-post-category">%1$s</span>',
+                                    esc_html($term->name)
+                                );
                             }
                         }
                     }
