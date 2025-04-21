@@ -137,6 +137,8 @@ function gct_get_filtered_posts() {
         }
         
         if (is_array($module_settings)) {
+            // Check if settings exist in the array, and evaluate them
+            // "on" means show the element, "off" means hide it
             $show_category = isset($module_settings['show_category']) ? ($module_settings['show_category'] === 'on') : true;
             $show_date = isset($module_settings['show_date']) ? ($module_settings['show_date'] === 'on') : true;
             $show_excerpt = isset($module_settings['show_excerpt']) ? ($module_settings['show_excerpt'] === 'on') : true;
@@ -215,11 +217,10 @@ function gct_get_filtered_posts() {
             echo '<article class="gct-post-item">';
             
             // Show category in top-right if enabled
-            if ($show_category && !empty($category_html)) {
-                echo '<div class="gct-post-meta-top">';
-                echo $category_html;
-                echo '</div>';
-            }
+            // Always include the meta-top div for styling consistency, even if category is hidden
+            echo '<div class="gct-post-meta-top"' . (!$show_category ? ' style="display:none;"' : '') . '>';
+            echo $category_html;
+            echo '</div>';
             
             // Post thumbnail with overlay (keeping proper structure)
             echo sprintf(
@@ -234,10 +235,13 @@ function gct_get_filtered_posts() {
             // Post content
             echo '<div class="gct-post-content">';
             
-            // Post meta with date
+            // Post meta with date - always include for styling consistency
             echo '<div class="gct-post-meta">';
             if ($show_date) {
                 echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
+            } else {
+                // Include hidden date element for consistency
+                echo sprintf('<div class="gct-post-date" style="display:none;">%1$s</div>', esc_html(get_the_date()));
             }
             echo '</div>';
             
@@ -248,15 +252,14 @@ function gct_get_filtered_posts() {
                 esc_html(get_the_title())
             );
             
-            // Post excerpt
-            if ($show_excerpt) {
-                $raw_excerpt = get_the_excerpt();
-                $trimmed_excerpt = wp_trim_words($raw_excerpt, 30, '...');
-                echo sprintf(
-                    '<div class="gct-post-excerpt">%1$s</div>',
-                    esc_html($trimmed_excerpt)
-                );
-            }
+            // Post excerpt - always include for styling consistency
+            $raw_excerpt = get_the_excerpt();
+            $trimmed_excerpt = wp_trim_words($raw_excerpt, 30, '...');
+            echo sprintf(
+                '<div class="gct-post-excerpt" %1$s>%2$s</div>',
+                !$show_excerpt ? 'style="display:none;"' : '',
+                esc_html($trimmed_excerpt)
+            );
             
             // Close post content
             echo '</div>';

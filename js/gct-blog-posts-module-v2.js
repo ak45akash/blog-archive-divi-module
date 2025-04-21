@@ -195,15 +195,29 @@
                                 ? JSON.parse(moduleSettings) 
                                 : moduleSettings;
                                 
-                            // Apply show/hide settings to new posts
+                            // IMPORTANT: For "on" values, we explicitly show the elements to ensure they're visible
                             if (settings.show_excerpt === 'off') {
                                 $newPosts.find('.gct-post-excerpt').hide();
+                            } else {
+                                $newPosts.find('.gct-post-excerpt').show();
                             }
+                            
                             if (settings.show_date === 'off') {
                                 $newPosts.find('.gct-post-date').hide();
+                            } else {
+                                // Explicitly show the date elements
+                                $newPosts.find('.gct-post-date').show();
+                                // Also ensure the .gct-post-meta container is visible
+                                $newPosts.find('.gct-post-meta').show();
                             }
+                            
                             if (settings.show_category === 'off') {
+                                $newPosts.find('.gct-post-meta-top').hide();
                                 $newPosts.find('.gct-post-category').hide();
+                            } else {
+                                // Explicitly show the category elements
+                                $newPosts.find('.gct-post-meta-top').show();
+                                $newPosts.find('.gct-post-category').show();
                             }
                         }
                         
@@ -233,6 +247,12 @@
                             if ($overlay.length === 0) {
                                 $thumbnail.append('<div class="gct-post-overlay"></div>');
                             }
+                            
+                            // Ensure category tag has correct positioning
+                            const $metaTop = $post.find('.gct-post-meta-top');
+                            if ($metaTop.length && !$metaTop.is(':visible')) {
+                                $metaTop.css('display', 'block');
+                            }
                         });
                         
                         // Apply module settings after content refresh
@@ -241,15 +261,29 @@
                                 ? JSON.parse(moduleSettings) 
                                 : moduleSettings;
                                 
-                            // Apply show/hide settings
+                            // IMPORTANT: For "on" values, we explicitly show the elements to ensure they're visible
                             if (settings.show_excerpt === 'off') {
                                 $postsWrapper.find('.gct-post-excerpt').hide();
+                            } else {
+                                $postsWrapper.find('.gct-post-excerpt').show();
                             }
+                            
                             if (settings.show_date === 'off') {
                                 $postsWrapper.find('.gct-post-date').hide();
+                            } else {
+                                // Explicitly show the date elements
+                                $postsWrapper.find('.gct-post-date').show();
+                                // Also ensure the .gct-post-meta container is visible
+                                $postsWrapper.find('.gct-post-meta').show();
                             }
+                            
                             if (settings.show_category === 'off') {
+                                $postsWrapper.find('.gct-post-meta-top').hide();
                                 $postsWrapper.find('.gct-post-category').hide();
+                            } else {
+                                // Explicitly show the category elements
+                                $postsWrapper.find('.gct-post-meta-top').show();
+                                $postsWrapper.find('.gct-post-category').show();
                             }
                         }
                     }
