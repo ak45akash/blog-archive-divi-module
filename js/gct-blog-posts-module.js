@@ -33,12 +33,12 @@
                 // Update URL parameter without reloading
                 updateUrlParam('gct_category', categoryId);
                 
-                // Get and update posts via AJAX
-                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, 1);
+                // When changing category, reset to page 1 and replace content
+                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, 1, false);
             });
             
-            // Handle pagination clicks
-            $module.find('.gct-pagination a').on('click', function(e) {
+            // Handle "See more" button clicks
+            $module.find('.gct-pagination').on('click', '.gct-load-more', function(e) {
                 e.preventDefault();
                 
                 const $link = $(this);
@@ -59,8 +59,8 @@
                 // Update URL parameter without reloading
                 updateUrlParam('gct_page', page);
                 
-                // Get and update posts via AJAX
-                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page);
+                // Get and append additional posts
+                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, true);
             });
         });
     }
@@ -68,11 +68,12 @@
     /**
      * Get filtered posts via AJAX
      */
-    function getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page) {
+    function getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, append = false) {
         const $postsWrapper = $container.find('.gct-posts-wrapper');
+        const $loadMoreButton = $container.find('.gct-load-more');
         
         // Add loading state
-        $postsWrapper.css('opacity', 0.5);
+        $loadMoreButton.text('Loading...').addClass('loading');
         
         const data = {
             action: 'gct_get_filtered_posts',
@@ -90,20 +91,29 @@
             data: data,
             success: function(response) {
                 if (response.success) {
-                    $postsWrapper.html(response.data.html);
-                    
-                    // Scroll to top of container
-                    $('html, body').animate({
-                        scrollTop: $container.offset().top - 100
-                    }, 500);
+                    // If we're appending posts (See more button)
+                    if (append) {
+                        // Extract the posts from the HTML response
+                        const $newContent = $(response.data.html);
+                        const $newPosts = $newContent.find('.gct-post-item');
+                        
+                        // Append the new posts to the existing grid
+                        $container.find('.gct-blog-posts-grid').append($newPosts);
+                        
+                        // Replace the pagination (for updating the See more button or removing it)
+                        $container.find('.gct-pagination').replaceWith($newContent.find('.gct-pagination'));
+                    } else {
+                        // Replace the entire content (category change)
+                        $postsWrapper.html(response.data.html);
+                    }
                 }
                 
                 // Remove loading state
-                $postsWrapper.css('opacity', 1);
+                $loadMoreButton.removeClass('loading');
             },
             error: function() {
                 // Remove loading state
-                $postsWrapper.css('opacity', 1);
+                $loadMoreButton.text('See more').removeClass('loading');
             }
         });
     }

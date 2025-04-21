@@ -412,9 +412,7 @@
                     
                     <!-- Pagination -->
                     <div class="gct-pagination">
-                        <a href="#" class="gct-page-number active" data-page="1">1</a>
-                        <a href="#" class="gct-page-number" data-page="2">2</a>
-                        <a href="#" class="gct-page-number" data-page="3">3</a>
+                        <a href="#" class="gct-load-more" data-page="2">See more</a>
                     </div>
                 </div>
             </div>
@@ -465,7 +463,7 @@
                         </article>
                     </div>
                     
-                    <!-- Load More Button -->
+                    <!-- Pagination -->
                     <div class="gct-pagination">
                         <a href="#" class="gct-load-more" data-page="2">See more</a>
                     </div>
@@ -523,17 +521,50 @@
                 }
             });
             
-            // Simple pagination functionality
-            $('.gct-pagination a').on('click', function(e) {
+            // "See more" button functionality
+            $('.gct-load-more').on('click', function(e) {
                 e.preventDefault();
                 
-                // Just for visual feedback
-                if ($(this).hasClass('gct-page-number')) {
-                    $('.gct-page-number').removeClass('active');
-                    $(this).addClass('active');
-                }
+                const $button = $(this);
+                const $container = $button.closest('.gct-blog-posts-container');
+                const $grid = $container.find('.gct-blog-posts-grid');
                 
-                alert('In a live environment, this would load the next page of posts.');
+                // Simulate loading
+                $button.text('Loading...').addClass('loading');
+                
+                // Simulate AJAX delay
+                setTimeout(function() {
+                    // Get sample post HTML from the existing posts
+                    let newPostsHTML = '';
+                    const postsPerRow = $grid.hasClass('posts-per-row-3') ? 3 : 2;
+                    const samplePosts = $grid.find('.gct-post-item');
+                    
+                    // Clone a few sample posts with different images
+                    for (let i = 0; i < postsPerRow; i++) {
+                        const randomPost = Math.floor(Math.random() * samplePosts.length);
+                        const $clonedPost = $(samplePosts[randomPost]).clone();
+                        
+                        // Update image to be unique
+                        const randomNum = Math.floor(Math.random() * 100) + 20;
+                        $clonedPost.find('.gct-post-thumbnail').css('background-image', 'url(https://picsum.photos/600/400?random=' + randomNum + ')');
+                        
+                        // Add to new posts
+                        newPostsHTML += $clonedPost[0].outerHTML;
+                    }
+                    
+                    // Append new posts
+                    $grid.append(newPostsHTML);
+                    
+                    // Simulate reaching the end after a few clicks
+                    const currentPage = parseInt($button.data('page'));
+                    if (currentPage >= 3) {
+                        $button.parent().remove(); // Remove pagination when no more posts
+                    } else {
+                        $button.data('page', currentPage + 1)
+                               .removeClass('loading')
+                               .text('See more');
+                    }
+                }, 1000);
             });
         });
     </script>

@@ -297,24 +297,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         $output = '<div class="gct-pagination">';
         
-        if ($pagination_type === 'numbers') {
-            for ($i = 1; $i <= $total_pages; $i++) {
-                $active_class = $i === $current_page ? ' active' : '';
-                $output .= sprintf(
-                    '<a href="#" class="gct-page-number%2$s" data-page="%1$s">%1$s</a>',
-                    esc_attr($i),
-                    esc_attr($active_class)
-                );
-            }
-        } elseif ($pagination_type === 'prev_next') {
-            if ($current_page > 1) {
-                $output .= '<a href="#" class="gct-prev-page" data-page="' . esc_attr($current_page - 1) . '">&laquo; ' . esc_html__('Previous', 'gct-blog-posts-module') . '</a>';
-            }
-            
-            if ($current_page < $total_pages) {
-                $output .= '<a href="#" class="gct-next-page" data-page="' . esc_attr($current_page + 1) . '">' . esc_html__('Next', 'gct-blog-posts-module') . ' &raquo;</a>';
-            }
-        } elseif ($pagination_type === 'load_more' && $current_page < $total_pages) {
+        // Only show the "See more" button if we haven't loaded all pages
+        if ($current_page < $total_pages) {
             $output .= '<a href="#" class="gct-load-more" data-page="' . esc_attr($current_page + 1) . '">' . esc_html($load_more_text) . '</a>';
         }
         
