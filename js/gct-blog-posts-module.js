@@ -73,7 +73,9 @@
         const $loadMoreButton = $container.find('.gct-load-more');
         
         // Add loading state
-        $loadMoreButton.text('Loading...').addClass('loading');
+        if ($loadMoreButton.length) {
+            $loadMoreButton.text('Loading...').addClass('loading');
+        }
         
         const data = {
             action: 'gct_get_filtered_posts',
@@ -100,20 +102,33 @@
                         // Append the new posts to the existing grid
                         $container.find('.gct-blog-posts-grid').append($newPosts);
                         
-                        // Replace the pagination (for updating the See more button or removing it)
-                        $container.find('.gct-pagination').replaceWith($newContent.find('.gct-pagination'));
+                        // Check if there's pagination in the response
+                        const $newPagination = $newContent.find('.gct-pagination');
+                        
+                        // If there's no pagination in the response, remove the existing pagination
+                        // This means we've loaded all posts
+                        if ($newPagination.length === 0) {
+                            $container.find('.gct-pagination').remove();
+                        } else {
+                            // Otherwise, replace the pagination (for updating the See more button)
+                            $container.find('.gct-pagination').replaceWith($newPagination);
+                        }
                     } else {
                         // Replace the entire content (category change)
                         $postsWrapper.html(response.data.html);
                     }
                 }
                 
-                // Remove loading state
-                $loadMoreButton.removeClass('loading');
+                // Remove loading state if the button still exists
+                if ($loadMoreButton.length) {
+                    $loadMoreButton.removeClass('loading');
+                }
             },
             error: function() {
                 // Remove loading state
-                $loadMoreButton.text('See more').removeClass('loading');
+                if ($loadMoreButton.length) {
+                    $loadMoreButton.text('See more').removeClass('loading');
+                }
             }
         });
     }

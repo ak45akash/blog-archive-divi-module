@@ -552,30 +552,6 @@
                 }
             });
             
-            // Simple category filter functionality
-            $('.gct-category-select').on('change', function() {
-                const categoryId = $(this).val();
-                const $items = $('.gct-post-item');
-                
-                if (categoryId === 'all') {
-                    $items.show();
-                } else {
-                    $items.hide();
-                    
-                    $items.each(function() {
-                        const category = $(this).find('.gct-post-category').text().trim();
-                        
-                        if ((categoryId === '1' && category === 'Announcements') ||
-                            (categoryId === '2' && category === 'Operational updates') ||
-                            (categoryId === '3' && category === 'General') ||
-                            (categoryId === '4' && category === 'Events') ||
-                            (categoryId === '5' && category === 'News')) {
-                            $(this).show();
-                        }
-                    });
-                }
-            });
-            
             // "See more" button functionality
             $('.gct-load-more').on('click', function(e) {
                 e.preventDefault();
@@ -618,13 +594,53 @@
                     // Simulate reaching the end after a few clicks
                     const currentPage = parseInt($button.data('page'));
                     if (currentPage >= 3) {
-                        $button.parent().remove(); // Remove pagination when no more posts
+                        $button.parent().remove(); // Remove pagination completely when no more posts
                     } else {
                         $button.data('page', currentPage + 1)
                                .removeClass('loading')
                                .text('See more');
                     }
                 }, 1000);
+            });
+            
+            // Simulate the initial state for categories with few posts
+            $('.gct-category-select').on('change', function() {
+                const categoryId = $(this).val();
+                const $items = $('.gct-post-item');
+                const $container = $(this).closest('.gct-blog-posts-container');
+                const $pagination = $container.find('.gct-pagination');
+                
+                if (categoryId === 'all') {
+                    $items.show();
+                    // Show pagination again for all posts
+                    $pagination.show();
+                } else {
+                    $items.hide();
+                    
+                    // Count how many items will be displayed for this category
+                    let visibleCount = 0;
+                    
+                    $items.each(function() {
+                        const category = $(this).find('.gct-post-category').text().trim();
+                        
+                        if ((categoryId === '1' && category === 'Announcements') ||
+                            (categoryId === '2' && category === 'Operational updates') ||
+                            (categoryId === '3' && category === 'General') ||
+                            (categoryId === '4' && category === 'Events') ||
+                            (categoryId === '5' && category === 'News')) {
+                            $(this).show();
+                            visibleCount++;
+                        }
+                    });
+                    
+                    // Hide pagination if there are few posts (simulating fewer posts than per page)
+                    // For demonstration purposes, hide if fewer than 3 posts
+                    if (visibleCount <= 3) {
+                        $pagination.hide();
+                    } else {
+                        $pagination.show();
+                    }
+                }
             });
         });
     </script>

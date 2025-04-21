@@ -291,20 +291,21 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
      * Generate pagination
      */
     private function generate_pagination($total_pages, $current_page = 1, $pagination_type = 'numbers', $load_more_text = 'See more') {
+        // If there's only one page or no pages, don't show pagination
         if ($total_pages <= 1) {
             return '';
         }
         
-        $output = '<div class="gct-pagination">';
-        
-        // Only show the "See more" button if we haven't loaded all pages
+        // Only if there are more pages to load
         if ($current_page < $total_pages) {
+            $output = '<div class="gct-pagination">';
             $output .= '<a href="#" class="gct-load-more" data-page="' . esc_attr($current_page + 1) . '">' . esc_html($load_more_text) . '</a>';
+            $output .= '</div>';
+            return $output;
         }
         
-        $output .= '</div>';
-        
-        return $output;
+        // If we're on the last page, don't show pagination
+        return '';
     }
     
     /**
