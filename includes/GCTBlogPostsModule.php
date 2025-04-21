@@ -446,6 +446,13 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Build post item
                 $output .= '<article class="gct-post-item">';
                 
+                // Post category (moved above thumbnail)
+                if ($show_category && !empty($categories)) {
+                    $output .= '<div class="gct-post-meta-top">';
+                    $output .= $categories;
+                    $output .= '</div>';
+                }
+                
                 // Post thumbnail with overlay
                 $output .= sprintf(
                     '<a href="%1$s" class="gct-post-thumbnail" %2$s>
@@ -459,9 +466,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Post content
                 $output .= '<div class="gct-post-content">';
                 
-                // Post meta
+                // Post date (moved from meta to its own section)
                 $output .= '<div class="gct-post-meta">';
-                $output .= $categories;
                 $output .= $date;
                 $output .= '</div>';
                 
@@ -534,6 +540,32 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             'selector'    => '%%order_class%% .gct-blog-posts-grid',
             'declaration' => 'grid-template-columns: repeat(1, 1fr);',
             'media_query' => ET_Builder_Element::get_media_query('max_width_767'),
+        ));
+        
+        // Post item
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-item',
+            'declaration' => 'position: relative; transition: all 0.3s ease;',
+        ));
+        
+        // Category above image
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-meta-top',
+            'declaration' => 'position: absolute; top: 10px; left: 10px; z-index: 5;',
+        ));
+        
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-meta-top .gct-post-category',
+            'declaration' => '
+                display: inline-block;
+                padding: 5px 10px;
+                background-color: #fff;
+                color: #333;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: 3px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            ',
         ));
         
         // Post thumbnail
