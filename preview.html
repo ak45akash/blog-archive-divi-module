@@ -133,11 +133,10 @@
                                 <span class="gct-post-category">Announcements</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=1');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">February 26, 2025</div>
                                 </div>
@@ -152,11 +151,10 @@
                                 <span class="gct-post-category">Operational updates</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=2');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">March 26, 2025</div>
                                 </div>
@@ -171,11 +169,10 @@
                                 <span class="gct-post-category">Announcements</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=3');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">March 17, 2025</div>
                                 </div>
@@ -190,11 +187,10 @@
                                 <span class="gct-post-category">Operational updates</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=4');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">January 12, 2025</div>
                                 </div>
@@ -209,11 +205,10 @@
                                 <span class="gct-post-category">Announcements</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=5');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">December 5, 2024</div>
                                 </div>
@@ -228,11 +223,10 @@
                                 <span class="gct-post-category">General</span>
                             </div>
                             <a href="#" class="gct-post-thumbnail" style="background-image:url('https://picsum.photos/600/400?random=6');">
-                                <div class="gct-post-overlay">
-                                    <!-- Removing the icon -->
-                                </div>
+                                <div class="gct-post-overlay"></div>
                             </a>
                             <div class="gct-post-content">
+                                <span class="gct-post-category">BURIAL & CREMATION</span>
                                 <div class="gct-post-meta">
                                     <div class="gct-post-date">November 27, 2024</div>
                                 </div>
@@ -256,52 +250,44 @@
     <!-- JavaScript to simulate module functionality -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Create a mock version of the WordPress AJAX parameters
-        var gct_blog_posts_params = {
-            ajaxurl: '#',
-            nonce: 'preview-nonce'
-        };
-    </script>
-    <script src="js/gct-blog-posts-module-v2.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Responsive preview controls
-            $('.view-btn').on('click', function() {
+        jQuery(document).ready(function($) {
+            // Handle responsive view controls
+            $('.view-btn').click(function() {
                 $('.view-btn').removeClass('active');
                 $(this).addClass('active');
                 
-                const viewportWidth = $(this).data('width');
-                const $container = $('.container');
-                
-                switch(viewportWidth) {
-                    case 'desktop':
-                        $container.css('max-width', '1200px');
-                        break;
-                    case 'tablet':
-                        $container.css('max-width', '768px');
-                        break;
-                    case 'mobile':
-                        $container.css('max-width', '480px');
-                        break;
+                const width = $(this).data('width');
+                if (width === 'mobile') {
+                    $('.container').css('max-width', '480px');
+                } else if (width === 'tablet') {
+                    $('.container').css('max-width', '768px');
+                } else {
+                    $('.container').css('max-width', '1200px');
                 }
             });
             
-            // Override the AJAX functionality for preview purposes
-            $.ajax = function(options) {
-                // Simulate successful AJAX response with a delay
+            // Function to update URL parameters
+            function updateUrlParam(key, value) {
+                let baseUrl = window.location.href.split('?')[0];
+                let urlParams = new URLSearchParams(window.location.search);
+                
+                if (value) {
+                    urlParams.set(key, value);
+                } else {
+                    urlParams.delete(key);
+                }
+                
+                const newParams = urlParams.toString();
+                const newUrl = baseUrl + (newParams ? '?' + newParams : '');
+                
+                // Update URL without reloading the page
+                window.history.pushState({}, '', newUrl);
+            }
+            
+            // Centralized function to generate simulated AJAX response
+            function updateSimulatedAjaxResponse(options, categoryId, page, settings) {
+                // Delay to simulate AJAX call
                 setTimeout(function() {
-                    const data = options.data;
-                    const categoryId = data.category_id;
-                    const page = data.page;
-                    const moduleSettings = data.module_settings;
-                    
-                    // Parse module settings
-                    let settings = moduleSettings;
-                    if (typeof moduleSettings === 'string') {
-                        settings = JSON.parse(moduleSettings);
-                    }
-                    
-                    // Generate sample posts HTML
                     let postsHTML = '';
                     
                     // Create a different number of posts based on category selection to simulate filtering
@@ -326,9 +312,15 @@
                         const randomNum = Math.floor(Math.random() * 100) + 20;
                         $clonedPost.find('.gct-post-thumbnail').css('background-image', 'url(https://picsum.photos/600/400?random=' + randomNum + ')');
                         
-                        // Make sure the post overlay is present
-                        if ($clonedPost.find('.gct-post-thumbnail .gct-post-overlay').length === 0) {
-                            $clonedPost.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
+                        // Ensure post structure includes the BURIAL & CREMATION category
+                        if (!$clonedPost.find('.gct-post-content > .gct-post-category').length) {
+                            $clonedPost.find('.gct-post-content').prepend('<span class="gct-post-category">BURIAL & CREMATION</span>');
+                        }
+                        
+                        // Make sure overlay has the correct structure
+                        const $overlay = $clonedPost.find('.gct-post-overlay');
+                        if ($overlay.html().trim() !== '') {
+                            $overlay.empty();
                         }
                         
                         // If category is selected, make sure posts match that category
@@ -342,6 +334,24 @@
                             }
                             $clonedPost.find('.gct-post-meta-top .gct-post-category').text(categoryName);
                         }
+                        
+                        // Set a random title
+                        const titles = [
+                            'Sustainable Practices in Modern Memorialization',
+                            'Understanding Cremation Options for Families',
+                            'New Memorial Garden Opening This Spring',
+                            'Community Event: Remembrance Service',
+                            'Navigating Burial Planning with Compassion',
+                            'The History and Evolution of Cremation Services'
+                        ];
+                        $clonedPost.find('.gct-post-title h3').text(titles[Math.floor(Math.random() * titles.length)]);
+                        
+                        // Set a random date
+                        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        const randomMonth = months[Math.floor(Math.random() * months.length)];
+                        const randomDay = Math.floor(Math.random() * 28) + 1;
+                        const randomYear = 2023;
+                        $clonedPost.find('.gct-post-date').text(`${randomMonth} ${randomDay}, ${randomYear}`);
                         
                         // Ensure that the post structure respects the module settings
                         // Show/hide category
@@ -416,7 +426,174 @@
                         });
                     }
                 }, 1000);
+            }
+            
+            // Simulated AJAX function for the preview
+            $.gctBlogPosts = {};
+            $.gctBlogPosts.ajax = function(options) {
+                const categoryId = options.data.category_id || 'all';
+                const page = options.data.page || 1;
+                const $container = $(options.data.container);
+                const settings = $container.data('module-settings');
+                
+                updateSimulatedAjaxResponse(options, categoryId, page, settings);
             };
+            
+            // Handle category filter change
+            $('.gct-category-select').on('change', function() {
+                const $container = $(this).closest('.gct-blog-posts-container');
+                const categoryId = $(this).val();
+                
+                // Update URL
+                updateUrlParam('category', categoryId !== 'all' ? categoryId : null);
+                
+                // Show loading indicator (if needed)
+                $container.find('.gct-posts-wrapper').addClass('loading');
+                
+                // Call simulated AJAX function
+                $.gctBlogPosts.ajax({
+                    data: {
+                        action: 'gct_get_filtered_posts',
+                        category_id: categoryId,
+                        page: 1,
+                        post_type: $container.data('post-type'),
+                        posts_per_page: $container.data('posts-per-page'),
+                        container: $container
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Replace content
+                            $container.find('.gct-posts-wrapper').html(response.data.html);
+                            
+                            // Remove loading indicator
+                            $container.find('.gct-posts-wrapper').removeClass('loading');
+                            
+                            // Bind event listeners to new elements
+                            bindEventListeners();
+                        }
+                    }
+                });
+            });
+            
+            // Function to bind event listeners
+            function bindEventListeners() {
+                // Load more button click handler
+                $('.gct-load-more').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    const $container = $(this).closest('.gct-blog-posts-container');
+                    const page = $(this).data('page');
+                    const categoryId = $container.find('.gct-category-select').val() || 'all';
+                    
+                    // Update URL
+                    updateUrlParam('page', page);
+                    
+                    // Call simulated AJAX function
+                    $.gctBlogPosts.ajax({
+                        data: {
+                            action: 'gct_get_filtered_posts',
+                            category_id: categoryId,
+                            page: page,
+                            post_type: $container.data('post-type'),
+                            posts_per_page: $container.data('posts-per-page'),
+                            container: $container
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Replace content
+                                $container.find('.gct-posts-wrapper').html(response.data.html);
+                                
+                                // Bind event listeners to new elements
+                                bindEventListeners();
+                            }
+                        }
+                    });
+                });
+                
+                // Numbered pagination click handler
+                $('.gct-pagination a:not(.gct-load-more, .gct-pagination-prev, .gct-pagination-next)').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    const $container = $(this).closest('.gct-blog-posts-container');
+                    const page = $(this).data('page');
+                    const categoryId = $container.find('.gct-category-select').val() || 'all';
+                    
+                    // Update URL
+                    updateUrlParam('page', page);
+                    
+                    // Scroll to top of container
+                    $('html, body').animate({
+                        scrollTop: $container.offset().top - 50
+                    }, 500);
+                    
+                    // Call simulated AJAX function
+                    $.gctBlogPosts.ajax({
+                        data: {
+                            action: 'gct_get_filtered_posts',
+                            category_id: categoryId,
+                            page: page,
+                            post_type: $container.data('post-type'),
+                            posts_per_page: $container.data('posts-per-page'),
+                            container: $container
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Replace content
+                                $container.find('.gct-posts-wrapper').html(response.data.html);
+                                
+                                // Bind event listeners to new elements
+                                bindEventListeners();
+                            }
+                        }
+                    });
+                });
+                
+                // Prev/Next pagination click handler
+                $('.gct-pagination-prev, .gct-pagination-next').on('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Skip if disabled
+                    if ($(this).hasClass('disabled')) {
+                        return;
+                    }
+                    
+                    const $container = $(this).closest('.gct-blog-posts-container');
+                    const page = $(this).data('page');
+                    const categoryId = $container.find('.gct-category-select').val() || 'all';
+                    
+                    // Update URL
+                    updateUrlParam('page', page);
+                    
+                    // Scroll to top of container
+                    $('html, body').animate({
+                        scrollTop: $container.offset().top - 50
+                    }, 500);
+                    
+                    // Call simulated AJAX function
+                    $.gctBlogPosts.ajax({
+                        data: {
+                            action: 'gct_get_filtered_posts',
+                            category_id: categoryId,
+                            page: page,
+                            post_type: $container.data('post-type'),
+                            posts_per_page: $container.data('posts-per-page'),
+                            container: $container
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Replace content
+                                $container.find('.gct-posts-wrapper').html(response.data.html);
+                                
+                                // Bind event listeners to new elements
+                                bindEventListeners();
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // Initialize event listeners
+            bindEventListeners();
         });
     </script>
 </body>
