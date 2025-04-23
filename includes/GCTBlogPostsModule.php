@@ -330,9 +330,39 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $pagination_type = $this->props['pagination_type'];
         $load_more_text = $this->props['load_more_text'];
         
+        // Store module settings as data attributes for AJAX consistency
+        $module_settings = htmlspecialchars(json_encode(array(
+            'show_category' => $show_category,
+            'show_date' => $show_date,
+            'show_excerpt' => $show_excerpt,
+            'excerpt_length' => $excerpt_length,
+            'posts_per_row' => $posts_per_row,
+            'show_pagination' => $show_pagination,
+            'pagination_type' => $pagination_type,
+            'load_more_text' => $load_more_text,
+        )), ENT_QUOTES, 'UTF-8');
+        
         // Determine current page and category
         $current_page = isset($_GET['gct_page']) ? max(1, intval($_GET['gct_page'])) : 1;
         $selected_category = isset($_GET['gct_category']) ? sanitize_text_field($_GET['gct_category']) : 'all';
+        
+        // Check if we're handling an AJAX request
+        $is_ajax = defined('DOING_AJAX') && DOING_AJAX && isset($_POST['action']) && $_POST['action'] === 'gct_get_filtered_posts';
+        
+        // If this is an AJAX request, get settings from POST data
+        if ($is_ajax && isset($_POST['module_settings'])) {
+            $ajax_settings = json_decode(stripslashes($_POST['module_settings']), true);
+            if (is_array($ajax_settings)) {
+                $show_category = isset($ajax_settings['show_category']) ? $ajax_settings['show_category'] : $show_category;
+                $show_date = isset($ajax_settings['show_date']) ? $ajax_settings['show_date'] : $show_date;
+                $show_excerpt = isset($ajax_settings['show_excerpt']) ? $ajax_settings['show_excerpt'] : $show_excerpt;
+                $excerpt_length = isset($ajax_settings['excerpt_length']) ? $ajax_settings['excerpt_length'] : $excerpt_length;
+                $posts_per_row = isset($ajax_settings['posts_per_row']) ? $ajax_settings['posts_per_row'] : $posts_per_row;
+                $show_pagination = isset($ajax_settings['show_pagination']) ? $ajax_settings['show_pagination'] : $show_pagination;
+                $pagination_type = isset($ajax_settings['pagination_type']) ? $ajax_settings['pagination_type'] : $pagination_type;
+                $load_more_text = isset($ajax_settings['load_more_text']) ? $ajax_settings['load_more_text'] : $load_more_text;
+            }
+        }
         
         // Query arguments
         $args = array(
@@ -363,7 +393,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $total_pages = $query->max_num_pages;
         
         // Start building output
-        $output = '<div class="gct-blog-posts-container" data-post-type="' . esc_attr($post_type) . '" data-posts-per-page="' . esc_attr($posts_number) . '">';
+        $output = '<div class="gct-blog-posts-container" data-post-type="' . esc_attr($post_type) . '" data-posts-per-page="' . esc_attr($posts_number) . '" data-module-settings="' . $module_settings . '">';
         
         // Module title
         if (!empty($module_title)) {
@@ -447,7 +477,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Build post item
                 $output .= '<article class="gct-post-item">';
                 
-                // Post category (moved above thumbnail)
+                // Post category on top of the image
                 if ($show_category && !empty($categories)) {
                     $output .= '<div class="gct-post-meta-top">';
                     $output .= $categories;
@@ -467,7 +497,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Post content
                 $output .= '<div class="gct-post-content">';
                 
-                // Post date (moved from meta to its own section)
+                // Second category label below the image (matches preview.html)
+                if ($show_category) {
+                    $output .= '<span class="gct-post-category">BURIAL &amp; CREMATION</span>';
+                }
+                
+                // Post date (in meta div for proper ordering)
                 $output .= '<div class="gct-post-meta">';
                 $output .= $date;
                 $output .= '</div>';
@@ -500,7 +535,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Add pagination if enabled
         if ($show_pagination) {
-            $output .= $this->generate_pagination($total_pages, $current_page, $pagination_type, $load_more_text);
+            // Always use 'load_more' pagination type rather than using the setting
+            $output .= $this->generate_pagination($total_pages, $current_page, 'load_more', $load_more_text);
         }
         
         // Close posts wrapper
@@ -518,8 +554,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
     public function add_custom_styles($render_slug) {
         // Base font styles
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%%, %%order_class%% .gct-module-title, %%order_class%% .gct-post-category, %%order_class%% .gct-post-date, %%order_class%% .gct-post-title, %%order_class%% .gct-post-excerpt, %%order_class%% .gct-category-filter label, %%order_class%% .gct-category-filter select, %%order_class%% .gct-load-more, %%order_class%% .gct-no-posts',
-            'declaration' => 'font-family: \'Libre Franklin\', Helvetica, Arial, Lucida, sans-serif;',
+            'selector'    => '%%order_class%%, %%order_class%% .gct-module-title, %%order_class%% .gct-post-category, %%order_class%% .gct-post-date, %%order_class%% .gct-post-title, %%order_class%% .gct-post-excerpt, %%order_class%% .gct-category-filter label, %%order_class%% .gct-category-filter select, %%order_class%% .gct-load-more, %%order_class%% .gct-no-posts, %%order_class%% h1, %%order_class%% h2, %%order_class%% h3, %%order_class%% h4, %%order_class%% h5, %%order_class%% h6, %%order_class%% p, %%order_class%% button, %%order_class%% a',
+            'declaration' => 'font-family: \'Libre Franklin\', sans-serif;',
         ));
         
         // Grid layout
@@ -549,190 +585,147 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             'media_query' => ET_Builder_Element::get_media_query('max_width_767'),
         ));
         
-        // Post item
+        // Post item styling
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-item',
-            'declaration' => 'position: relative; transition: all 0.3s ease;',
+            'declaration' => 'position: relative; transition: all 0.3s ease; border-radius: 0; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.08); background-color: #fff; display: flex; flex-direction: column;',
         ));
         
-        // Category above image
+        // Post item hover
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-meta-top',
-            'declaration' => 'position: absolute; top: 10px; left: 10px; z-index: 5;',
-        ));
-        
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-meta-top .gct-post-category',
-            'declaration' => '
-                display: inline-block;
-                padding: 5px 10px;
-                background-color: #fff;
-                color: #333;
-                font-size: 12px;
-                font-weight: 600;
-                border-radius: 3px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            ',
+            'selector'    => '%%order_class%% .gct-post-item:hover',
+            'declaration' => 'box-shadow: 0 3px 10px rgba(0,0,0,0.1); transform: translateY(-3px);',
         ));
         
         // Post thumbnail
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-thumbnail',
-            'declaration' => '
-                display: block;
-                position: relative;
-                height: 240px;
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-color: #f5f5f5;
-            ',
+            'declaration' => 'display: block; position: relative; height: 220px; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #f5f5f5; width: 100%;',
         ));
         
-        // Post overlay - normal state
+        // Category on top of image
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-overlay',
-            'declaration' => sprintf('
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%%;
-                height: 100%%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                background-color: %1$s;
-            ', $this->props['overlay_color']),
+            'selector'    => '%%order_class%% .gct-post-meta-top',
+            'declaration' => 'position: absolute; top: 15px; left: 15px; z-index: 5;',
         ));
         
-        // Post overlay - hover state
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-thumbnail:hover .gct-post-overlay',
-            'declaration' => 'opacity: 1;',
+            'selector'    => '%%order_class%% .gct-post-meta-top .gct-post-category',
+            'declaration' => 'display: inline-block; padding: 5px 10px; background-color: #254B45; color: #ffffff; font-size: 12px; font-weight: 600; border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px;',
+        ));
+        
+        // Category below image
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-content .gct-post-category',
+            'declaration' => 'display: block; padding: 0; background-color: transparent; color: #F7941C; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; order: -2;',
+        ));
+        
+        // Date meta section
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-meta',
+            'declaration' => 'margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; order: -1;',
         ));
         
         // Post content
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-content',
-            'declaration' => 'padding: 20px 0;',
+            'declaration' => 'padding: 20px; flex-grow: 1; display: flex; flex-direction: column; border-top: none;',
         ));
         
-        // Post meta
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-meta',
-            'declaration' => 'margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px;',
-        ));
+        // Other styles already added via external CSS, focusing on crucial structural elements here for proper layout
+    }
+    
+    /**
+     * AJAX handler for filtering posts
+     */
+    public function ajax_get_filtered_posts() {
+        // Check nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'gct_blog_posts_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
         
-        // Post category
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-category',
-            'declaration' => '
-                display: inline-block;
-                padding: 3px 8px;
-                background-color: #f0f0f0;
-                color: #666;
-                font-size: 12px;
-                border-radius: 3px;
-                margin-right: 5px;
-            ',
-        ));
+        // Get POST data
+        $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
+        $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'category';
+        $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+        $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : get_option('posts_per_page');
+        $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
         
-        // Post date
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-date',
-            'declaration' => 'font-size: 14px; color: #999;',
-        ));
+        // Get module settings from AJAX request
+        $module_settings = isset($_POST['module_settings']) ? $_POST['module_settings'] : null;
         
-        // Post title
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-title',
-            'declaration' => 'margin-top: 0; margin-bottom: 15px; font-size: 20px; line-height: 1.3;',
-        ));
+        // If we have module settings, update our current instance settings
+        if ($module_settings) {
+            if (is_string($module_settings)) {
+                $module_settings = json_decode(stripslashes($module_settings), true);
+            }
+            
+            // Update our instance with these settings
+            if (is_array($module_settings)) {
+                foreach ($module_settings as $key => $value) {
+                    if (property_exists($this, $key)) {
+                        $this->$key = $value;
+                    }
+                }
+            }
+        }
         
-        // Post title link
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-title a',
-            'declaration' => 'color: inherit; text-decoration: none;',
-        ));
+        // Force excerpt display according to original setting
+        if (isset($module_settings['show_excerpt'])) {
+            $this->show_excerpt = $module_settings['show_excerpt'];
+        }
         
-        // Post excerpt
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-excerpt',
-            'declaration' => 'font-size: 16px; line-height: 1.5; color: #666;',
-        ));
+        // Build query args
+        $args = array(
+            'post_type' => $post_type,
+            'posts_per_page' => $posts_per_page,
+            'paged' => $page
+        );
         
-        // Module title
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-module-title',
-            'declaration' => 'margin-bottom: 30px; font-size: 32px; color: #000; font-weight: 600;',
-        ));
+        // Add taxonomy query if category is selected
+        if ($category_id > 0) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => $taxonomy,
+                    'field' => 'term_id',
+                    'terms' => $category_id
+                )
+            );
+        }
         
-        // Category filter
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-category-filter',
-            'declaration' => 'margin-bottom: 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px;',
-        ));
+        // Get posts
+        $query = new \WP_Query($args);
         
-        // Category filter label
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-category-filter label',
-            'declaration' => 'font-weight: normal; font-size: 16px; color: #000;',
-        ));
+        // Prepare HTML response
+        ob_start();
         
-        // Category filter select
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-category-filter select',
-            'declaration' => 'padding: 8px 30px 8px 12px; background-color: #eee; border: none; border-radius: 0; font-size: 16px; color: #000; min-width: 240px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' width=\'24\' height=\'24\'%3E%3Cpath fill=\'none\' d=\'M0 0h24v24H0z\'/%3E%3Cpath d=\'M12 13.172l4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222z\'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;',
-        ));
+        echo '<div class="gct-blog-posts-grid gct-blog-posts-grid-' . esc_attr($this->columns) . '">';
         
-        // Pagination container
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-pagination',
-            'declaration' => 'margin-top: 40px; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px;',
-        ));
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $this->render_post(get_the_ID());
+            }
+        } else {
+            echo '<div class="gct-no-posts">' . __('No posts found.', 'gct-custom-post') . '</div>';
+        }
         
-        // Pagination item
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-pagination a',
-            'declaration' => 'display: inline-block; padding: 8px 16px; margin: 0 5px; color: #666; background-color: #f0f0f0; text-decoration: none; border-radius: 4px; transition: all 0.3s ease;',
-        ));
+        echo '</div>'; // .gct-blog-posts-grid
         
-        // Pagination active item
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-pagination a.active',
-            'declaration' => 'background-color: #2ea3f2; color: #fff;',
-        ));
+        // Add pagination if needed
+        if ($query->max_num_pages > 1) {
+            $this->render_pagination($query->max_num_pages, $page);
+        }
         
-        // Pagination item hover
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-pagination a:hover',
-            'declaration' => 'background-color: #e0e0e0;',
-        ));
+        $html = ob_get_clean();
         
-        // Pagination active item hover
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-pagination a.active:hover',
-            'declaration' => 'background-color: #0c71c3;',
-        ));
+        wp_reset_postdata();
         
-        // Load more button
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-load-more',
-            'declaration' => 'display: inline-block; padding: 12px 35px; background-color: #F6941C; color: #ffffff; text-decoration: none; border-radius: 4px; transition: all 0.3s ease; cursor: pointer; font-weight: 600; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);',
-        ));
-        
-        // Load more button hover
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-load-more:hover',
-            'declaration' => 'background-color: #244B45; color: #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15);',
-        ));
-        
-        // Load more button loading state
-        ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-load-more.loading',
-            'declaration' => 'background-color: #F6941C; opacity: 0.8; color: #ffffff; cursor: wait;',
+        // Send response
+        wp_send_json_success(array(
+            'html' => $html,
+            'page' => $page,
+            'max_pages' => $query->max_num_pages
         ));
     }
 }
