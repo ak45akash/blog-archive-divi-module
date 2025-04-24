@@ -477,13 +477,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Build post item
                 $output .= '<article class="gct-post-item">';
                 
-                // Post category on top of the image
-                if ($show_category && !empty($categories)) {
-                    $output .= '<div class="gct-post-meta-top">';
-                    $output .= $categories;
-                    $output .= '</div>';
-                }
-                
                 // Post thumbnail with overlay
                 $output .= sprintf(
                     '<a href="%1$s" class="gct-post-thumbnail" %2$s>
@@ -497,12 +490,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 // Post content
                 $output .= '<div class="gct-post-content">';
                 
-                // Second category label below the image (matches preview.html)
-                if ($show_category) {
+                // Category below image 
+                if ($show_category === 'on' || $show_category === true) {
                     $output .= '<span class="gct-post-category">BURIAL &amp; CREMATION</span>';
                 }
                 
-                // Post date (in meta div for proper ordering)
+                // Post date
                 $output .= '<div class="gct-post-meta">';
                 $output .= $date;
                 $output .= '</div>';
@@ -514,8 +507,10 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                     esc_html(get_the_title())
                 );
                 
-                // Post excerpt
-                $output .= $excerpt;
+                // Post excerpt - only show if explicitly set to 'on'
+                if ($show_excerpt === 'on' || $show_excerpt === true) {
+                    $output .= $excerpt;
+                }
                 
                 // Close post content
                 $output .= '</div>';
@@ -588,30 +583,36 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Post item styling
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-item',
-            'declaration' => 'position: relative; transition: all 0.3s ease; border-radius: 0; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.08); background-color: #fff; display: flex; flex-direction: column;',
+            'declaration' => 'position: relative; transition: all 0.3s ease; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.08); background-color: #fff; display: flex; flex-direction: column;',
         ));
         
-        // Post item hover
+        // Post item hover - no transform
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-item:hover',
-            'declaration' => 'box-shadow: 0 3px 10px rgba(0,0,0,0.1); transform: translateY(-3px);',
+            'declaration' => 'box-shadow: 0 3px 10px rgba(0,0,0,0.1);',
         ));
         
         // Post thumbnail
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-thumbnail',
-            'declaration' => 'display: block; position: relative; height: 220px; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #f5f5f5; width: 100%;',
+            'declaration' => 'display: block; position: relative; height: 220px; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #f5f5f5; width: 100%; transition: transform 0.3s ease; border-radius: 20px 20px 0 0;',
         ));
         
-        // Category on top of image
+        // Post thumbnail hover effect
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-meta-top',
-            'declaration' => 'position: absolute; top: 15px; left: 15px; z-index: 5;',
+            'selector'    => '%%order_class%% .gct-post-item:hover .gct-post-thumbnail',
+            'declaration' => 'transform: scale(1.05);',
+        ));
+        
+        // Post overlay effect
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-overlay',
+            'declaration' => 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: background-color 0.3s ease;',
         ));
         
         ET_Builder_Element::set_style($render_slug, array(
-            'selector'    => '%%order_class%% .gct-post-meta-top .gct-post-category',
-            'declaration' => 'display: inline-block; padding: 5px 10px; background-color: #254B45; color: #ffffff; font-size: 12px; font-weight: 600; border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px;',
+            'selector'    => '%%order_class%% .gct-post-item:hover .gct-post-overlay',
+            'declaration' => 'background-color: rgba(0,0,0,0.2);',
         ));
         
         // Category below image
@@ -629,10 +630,14 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Post content
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-content',
-            'declaration' => 'padding: 20px; flex-grow: 1; display: flex; flex-direction: column; border-top: none;',
+            'declaration' => 'padding: 20px; flex-grow: 1; display: flex; flex-direction: column; border-top: none; overflow: hidden;',
         ));
         
-        // Other styles already added via external CSS, focusing on crucial structural elements here for proper layout
+        // Post title hover
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-post-title a:hover',
+            'declaration' => 'color: #F7941C !important;',
+        ));
     }
     
     /**
@@ -647,43 +652,35 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Get POST data
         $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
         $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'category';
-        $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+        $category_id = isset($_POST['category_id']) ? sanitize_text_field($_POST['category_id']) : 'all';
         $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : get_option('posts_per_page');
         $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+        $posts_per_row = isset($_POST['posts_per_row']) ? intval($_POST['posts_per_row']) : 3;
         
-        // Get module settings from AJAX request
-        $module_settings = isset($_POST['module_settings']) ? $_POST['module_settings'] : null;
-        
-        // If we have module settings, update our current instance settings
-        if ($module_settings) {
-            if (is_string($module_settings)) {
-                $module_settings = json_decode(stripslashes($module_settings), true);
-            }
-            
-            // Update our instance with these settings
-            if (is_array($module_settings)) {
-                foreach ($module_settings as $key => $value) {
-                    if (property_exists($this, $key)) {
-                        $this->$key = $value;
-                    }
-                }
-            }
+        // Get module settings
+        $module_settings = array();
+        if (isset($_POST['module_settings']) && !empty($_POST['module_settings'])) {
+            $module_settings = json_decode(stripslashes($_POST['module_settings']), true);
         }
         
-        // Force excerpt display according to original setting
-        if (isset($module_settings['show_excerpt'])) {
-            $this->show_excerpt = $module_settings['show_excerpt'];
-        }
+        // Ensure we get the correct settings
+        $show_category = isset($module_settings['show_category']) ? $module_settings['show_category'] : 'on';
+        $show_date = isset($module_settings['show_date']) ? $module_settings['show_date'] : 'on';
+        $show_excerpt = isset($module_settings['show_excerpt']) ? $module_settings['show_excerpt'] : 'on';
+        $excerpt_length = isset($module_settings['excerpt_length']) ? intval($module_settings['excerpt_length']) : 150;
+        $pagination_type = isset($module_settings['pagination_type']) ? $module_settings['pagination_type'] : 'load_more';
+        $load_more_text = isset($module_settings['load_more_text']) ? $module_settings['load_more_text'] : 'See more';
         
         // Build query args
         $args = array(
             'post_type' => $post_type,
             'posts_per_page' => $posts_per_page,
-            'paged' => $page
+            'paged' => $page,
+            'post_status' => 'publish'
         );
         
         // Add taxonomy query if category is selected
-        if ($category_id > 0) {
+        if ($category_id !== 'all') {
             $args['tax_query'] = array(
                 array(
                     'taxonomy' => $taxonomy,
@@ -694,38 +691,115 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         }
         
         // Get posts
-        $query = new \WP_Query($args);
+        $query = new WP_Query($args);
         
-        // Prepare HTML response
-        ob_start();
+        // Calculate total pages for pagination
+        $total_pages = $query->max_num_pages;
         
-        echo '<div class="gct-blog-posts-grid gct-blog-posts-grid-' . esc_attr($this->columns) . '">';
+        // Start building HTML response
+        $output = '';
         
+        // Posts grid
+        $output .= sprintf(
+            '<div class="gct-blog-posts-grid posts-per-row-%1$s">',
+            esc_attr($posts_per_row)
+        );
+        
+        // Loop through posts
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
-                $this->render_post(get_the_ID());
+                
+                // Get featured image
+                $has_thumbnail = has_post_thumbnail();
+                $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
+                $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
+                
+                // Get date
+                $date = '';
+                if ($show_date === 'on') {
+                    $date = sprintf(
+                        '<div class="gct-post-date">%1$s</div>',
+                        esc_html(get_the_date())
+                    );
+                }
+                
+                // Get excerpt
+                $excerpt = '';
+                if ($show_excerpt === 'on') {
+                    $raw_excerpt = get_the_excerpt();
+                    $trimmed_excerpt = wp_trim_words($raw_excerpt, $excerpt_length / 5, '...');
+                    $excerpt = sprintf(
+                        '<div class="gct-post-excerpt">%1$s</div>',
+                        esc_html($trimmed_excerpt)
+                    );
+                }
+                
+                // Build post item
+                $output .= '<article class="gct-post-item">';
+                
+                // Post thumbnail with overlay
+                $output .= sprintf(
+                    '<a href="%1$s" class="gct-post-thumbnail" %2$s>
+                        <div class="gct-post-overlay">
+                        </div>
+                    </a>',
+                    esc_url(get_permalink()),
+                    $thumbnail_style
+                );
+                
+                // Post content
+                $output .= '<div class="gct-post-content">';
+                
+                // Category below image 
+                if ($show_category === 'on' || $show_category === true) {
+                    $output .= '<span class="gct-post-category">BURIAL &amp; CREMATION</span>';
+                }
+                
+                // Post date
+                $output .= '<div class="gct-post-meta">';
+                $output .= $date;
+                $output .= '</div>';
+                
+                // Post title
+                $output .= sprintf(
+                    '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
+                    esc_url(get_permalink()),
+                    esc_html(get_the_title())
+                );
+                
+                // Post excerpt - only show if explicitly set to 'on'
+                if ($show_excerpt === 'on' || $show_excerpt === true) {
+                    $output .= $excerpt;
+                }
+                
+                // Close post content
+                $output .= '</div>';
+                
+                // Close post item
+                $output .= '</article>';
             }
+            
+            // Reset post data
+            wp_reset_postdata();
         } else {
-            echo '<div class="gct-no-posts">' . __('No posts found.', 'gct-custom-post') . '</div>';
+            $output .= '<p class="gct-no-posts">' . esc_html__('No posts found.', 'gct-blog-posts-module') . '</p>';
         }
         
-        echo '</div>'; // .gct-blog-posts-grid
+        // Close posts grid
+        $output .= '</div>';
         
         // Add pagination if needed
-        if ($query->max_num_pages > 1) {
-            $this->render_pagination($query->max_num_pages, $page);
+        if ($show_pagination !== 'off' && $total_pages > 1 && $page < $total_pages) {
+            $output .= $this->generate_pagination($total_pages, $page, 'load_more', $load_more_text);
         }
-        
-        $html = ob_get_clean();
-        
-        wp_reset_postdata();
         
         // Send response
         wp_send_json_success(array(
-            'html' => $html,
-            'page' => $page,
-            'max_pages' => $query->max_num_pages
+            'success' => true,
+            'data' => array(
+                'html' => $output
+            )
         ));
     }
 }

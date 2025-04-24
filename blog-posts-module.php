@@ -218,9 +218,9 @@ function gct_get_filtered_posts() {
             
             // Show category in top-right if enabled
             // Always include the meta-top div for styling consistency, even if category is hidden
-            echo '<div class="gct-post-meta-top"' . (!$show_category ? ' style="display:none;"' : '') . '>';
-            echo $category_html;
-            echo '</div>';
+            // echo '<div class="gct-post-meta-top"' . (!$show_category ? ' style="display:none;"' : '') . '>';
+            // echo $category_html;
+            // echo '</div>';
             
             // Post thumbnail with overlay (keeping proper structure)
             echo sprintf(
