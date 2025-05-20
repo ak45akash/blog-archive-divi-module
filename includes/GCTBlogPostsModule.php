@@ -869,6 +869,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             if ($show_event_date) {
                 $event_date = get_post_meta(get_the_ID(), 'date', true);
                 if (!empty($event_date)) {
+                    // The date is already formatted from the custom field
                     echo sprintf(
                         '<div class="gct-event-date"><span class="gct-event-label">Event Date:</span> %1$s</div>',
                         esc_html($event_date)
