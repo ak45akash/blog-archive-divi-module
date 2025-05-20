@@ -43,4 +43,11 @@ wp-content/wp-cache-config.php
 composer.phar
 /vendor/
 package-lock.json
-yarn.lock 
+yarn.lock
+
+# macOS specific files
+._*
+.DS_Store?
+.AppleDouble
+.LSOverride
+Icon 
