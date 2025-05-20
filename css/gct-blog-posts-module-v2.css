@@ -197,6 +197,21 @@ h1, h2, h3, h4, h5, h6, p, button, a {
     order: -2 !important; /* Ensure it appears before date */
 }
 
+/* Event date and location styling */
+.gct-event-date,
+.gct-event-location {
+    font-size: 14px !important;
+    color: #666 !important;
+    margin-bottom: 8px !important;
+    line-height: 1.4 !important;
+}
+
+.gct-event-label {
+    font-weight: 600 !important;
+    color: #254B45 !important;
+}
+
+/* Post meta styling */
 .gct-post-meta {
     margin-bottom: 10px !important;
     display: flex !important;

@@ -166,6 +166,32 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 'default'         => 'on',
                 'toggle_slug'     => 'elements',
             ),
+            'show_event_date' => array(
+                'label'           => esc_html__('Show Event Date', 'gct-blog-posts-module'),
+                'type'            => 'yes_no_button',
+                'option_category' => 'configuration',
+                'options'         => array(
+                    'on'  => esc_html__('Yes', 'gct-blog-posts-module'),
+                    'off' => esc_html__('No', 'gct-blog-posts-module'),
+                ),
+                'default'         => 'on',
+                'toggle_slug'     => 'elements',
+                'show_if'         => array('post_type' => 'event'),
+                'description'     => esc_html__('Show the event date from custom field.', 'gct-blog-posts-module'),
+            ),
+            'show_event_location' => array(
+                'label'           => esc_html__('Show Event Location', 'gct-blog-posts-module'),
+                'type'            => 'yes_no_button',
+                'option_category' => 'configuration',
+                'options'         => array(
+                    'on'  => esc_html__('Yes', 'gct-blog-posts-module'),
+                    'off' => esc_html__('No', 'gct-blog-posts-module'),
+                ),
+                'default'         => 'on',
+                'toggle_slug'     => 'elements',
+                'show_if'         => array('post_type' => 'event'),
+                'description'     => esc_html__('Show the event location from custom field.', 'gct-blog-posts-module'),
+            ),
             'excerpt_length' => array(
                 'label'           => esc_html__('Excerpt Length', 'gct-blog-posts-module'),
                 'type'            => 'range',
@@ -341,6 +367,10 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $load_more_text = $this->props['load_more_text'];
         $category_filter = isset($this->props['category_filter']) ? $this->props['category_filter'] : 'all';
         
+        // Get event-specific settings
+        $show_event_date = isset($this->props['show_event_date']) ? $this->props['show_event_date'] === 'on' : true;
+        $show_event_location = isset($this->props['show_event_location']) ? $this->props['show_event_location'] === 'on' : true;
+        
         // Store module settings as data attributes for AJAX consistency
         $module_settings = htmlspecialchars(json_encode(array(
             'show_category' => $show_category,
@@ -351,6 +381,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             'show_pagination' => $show_pagination,
             'pagination_type' => $pagination_type,
             'load_more_text' => $load_more_text,
+            'show_event_date' => $show_event_date,
+            'show_event_location' => $show_event_location,
         )), ENT_QUOTES, 'UTF-8');
         
         // Determine current page and category
@@ -681,6 +713,10 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             $module_settings = json_decode(stripslashes($module_settings), true);
         }
         
+        // Set global variable for module settings to be used in render_post_item
+        global $gct_blog_posts_settings;
+        $gct_blog_posts_settings = $module_settings;
+        
         // Query arguments
         $args = array(
             'post_type'      => $post_type,
@@ -767,6 +803,21 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
         $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
         
+        // Get module settings
+        $show_event_date = true;
+        $show_event_location = true;
+        
+        // AJAX handling - get settings from global variable if they exist
+        global $gct_blog_posts_settings;
+        if (isset($gct_blog_posts_settings)) {
+            if (isset($gct_blog_posts_settings['show_event_date'])) {
+                $show_event_date = $gct_blog_posts_settings['show_event_date'];
+            }
+            if (isset($gct_blog_posts_settings['show_event_location'])) {
+                $show_event_location = $gct_blog_posts_settings['show_event_location'];
+            }
+        }
+        
         // Start post item
         echo '<article class="gct-post-item">';
         
@@ -808,6 +859,31 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                             esc_html($terms[0]->name)
                         );
                     }
+                }
+            }
+        }
+        
+        // Check if we need to display event data
+        if ($post_type === 'event') {
+            // Get event date from custom field
+            if ($show_event_date) {
+                $event_date = get_post_meta(get_the_ID(), 'date', true);
+                if (!empty($event_date)) {
+                    echo sprintf(
+                        '<div class="gct-event-date"><span class="gct-event-label">Event Date:</span> %1$s</div>',
+                        esc_html($event_date)
+                    );
+                }
+            }
+            
+            // Get event location from custom field
+            if ($show_event_location) {
+                $event_location = get_post_meta(get_the_ID(), 'location', true);
+                if (!empty($event_location)) {
+                    echo sprintf(
+                        '<div class="gct-event-location"><span class="gct-event-label">Location:</span> %1$s</div>',
+                        esc_html($event_location)
+                    );
                 }
             }
         }
