@@ -12,6 +12,100 @@
         $(document).on('ajaxComplete', function(event, xhr, settings) {
             initGCTBlogPostsModule();
         });
+
+        // Handle category filter change
+        $('.gct-category-filter').on('change', function() {
+            var $filter = $(this);
+            var $container = $filter.closest('.gct-blog-posts-container');
+            var $postsWrapper = $container.find('.gct-posts-wrapper');
+            var postType = $filter.data('post-type');
+            var categoryId = $filter.val();
+            var postsPerPage = $container.data('posts-per-page');
+            var moduleSettings = $container.data('module-settings');
+            
+            // Show loading state
+            $postsWrapper.addClass('loading');
+            
+            // Make AJAX request
+            $.ajax({
+                url: gct_blog_posts_params.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'gct_get_filtered_posts',
+                    nonce: gct_blog_posts_params.nonce,
+                    post_type: postType,
+                    category_id: categoryId,
+                    posts_per_page: postsPerPage,
+                    page: 1,
+                    module_settings: moduleSettings
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Update posts wrapper
+                        $postsWrapper.html(response.data.html);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                },
+                complete: function() {
+                    $postsWrapper.removeClass('loading');
+                }
+            });
+        });
+
+        // Handle load more button
+        $(document).on('click', '.gct-load-more', function(e) {
+            e.preventDefault();
+            
+            var $button = $(this);
+            var $container = $button.closest('.gct-blog-posts-container');
+            var $postsGrid = $container.find('.gct-blog-posts-grid');
+            var postType = $container.data('post-type');
+            var categoryId = $container.find('.gct-category-filter').val() || 'all';
+            var postsPerPage = $container.data('posts-per-page');
+            var currentPage = parseInt($button.data('current-page'));
+            var nextPage = currentPage + 1;
+            var moduleSettings = $container.data('module-settings');
+            
+            // Show loading state
+            $button.addClass('loading');
+            
+            // Make AJAX request
+            $.ajax({
+                url: gct_blog_posts_params.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'gct_get_filtered_posts',
+                    nonce: gct_blog_posts_params.nonce,
+                    post_type: postType,
+                    category_id: categoryId,
+                    posts_per_page: postsPerPage,
+                    page: nextPage,
+                    module_settings: moduleSettings,
+                    load_more: true
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Append new posts
+                        $postsGrid.append(response.data.posts_html);
+                        
+                        // Update or remove button based on pagination
+                        if (response.data.has_more) {
+                            $button.data('current-page', nextPage);
+                        } else {
+                            $button.parent().remove();
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                },
+                complete: function() {
+                    $button.removeClass('loading');
+                }
+            });
+        });
     });
     
     /**

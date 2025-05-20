@@ -58,6 +58,16 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 'toggle_slug'       => 'main_content',
                 'affects'           => array('category_filter'),
             ),
+            'category_filter' => array(
+                'label'             => esc_html__('Default Category', 'gct-blog-posts-module'),
+                'type'              => 'select',
+                'option_category'   => 'basic_option',
+                'options'           => $this->get_categories_for_post_type('post'),
+                'default'           => 'all',
+                'description'       => esc_html__('Select the default category to display.', 'gct-blog-posts-module'),
+                'toggle_slug'       => 'main_content',
+                'show_if'           => array('post_type' => 'post'),
+            ),
             'posts_number' => array(
                 'label'           => esc_html__('Posts Per Page', 'gct-blog-posts-module'),
                 'type'            => 'text',
@@ -329,6 +339,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $show_pagination = $this->props['show_pagination'] === 'on';
         $pagination_type = $this->props['pagination_type'];
         $load_more_text = $this->props['load_more_text'];
+        $category_filter = isset($this->props['category_filter']) ? $this->props['category_filter'] : 'all';
         
         // Store module settings as data attributes for AJAX consistency
         $module_settings = htmlspecialchars(json_encode(array(
@@ -344,7 +355,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Determine current page and category
         $current_page = isset($_GET['gct_page']) ? max(1, intval($_GET['gct_page'])) : 1;
-        $selected_category = isset($_GET['gct_category']) ? sanitize_text_field($_GET['gct_category']) : 'all';
+        $selected_category = isset($_GET['gct_category']) ? sanitize_text_field($_GET['gct_category']) : $category_filter;
         
         // Check if we're handling an AJAX request
         $is_ajax = defined('DOING_AJAX') && DOING_AJAX && isset($_POST['action']) && $_POST['action'] === 'gct_get_filtered_posts';
@@ -395,14 +406,22 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Start building output
         $output = '<div class="gct-blog-posts-container" data-post-type="' . esc_attr($post_type) . '" data-posts-per-page="' . esc_attr($posts_number) . '" data-module-settings="' . $module_settings . '">';
         
-        // Module title
+        // Module title (left-aligned)
         if (!empty($module_title)) {
-            $output .= sprintf('<h2 class="gct-module-title">%1$s</h2>', esc_html($module_title));
+            $output .= sprintf('<h2 class="gct-module-title" style="text-align: left;">%1$s</h2>', esc_html($module_title));
         }
         
         // Category filter
         if ($show_category_filter) {
-            $output .= $this->generate_category_dropdown($post_type, $selected_category, $category_filter_label);
+            $output .= sprintf(
+                '<div class="gct-blog-posts-filter">
+                    <select class="gct-category-filter" data-post-type="%1$s">
+                        %2$s
+                    </select>
+                </div>',
+                esc_attr($post_type),
+                $this->generate_category_dropdown($post_type, $selected_category, $category_filter_label)
+            );
         }
         
         // Posts container for AJAX updates
@@ -641,53 +660,47 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
     }
     
     /**
-     * AJAX handler for filtering posts
+     * AJAX handler for filtered posts
      */
     public function ajax_get_filtered_posts() {
-        // Check nonce
+        // Verify nonce
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'gct_blog_posts_nonce')) {
-            wp_send_json_error('Invalid nonce');
+            wp_send_json_error(array('message' => 'Invalid security token.'));
         }
         
-        // Get POST data
+        // Get parameters
         $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
-        $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : 'category';
         $category_id = isset($_POST['category_id']) ? sanitize_text_field($_POST['category_id']) : 'all';
-        $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : get_option('posts_per_page');
-        $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
-        $posts_per_row = isset($_POST['posts_per_row']) ? intval($_POST['posts_per_row']) : 3;
+        $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 6;
+        $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+        $load_more = isset($_POST['load_more']) && $_POST['load_more'] === 'true';
         
-        // Get module settings
-        $module_settings = array();
-        if (isset($_POST['module_settings']) && !empty($_POST['module_settings'])) {
-            $module_settings = json_decode(stripslashes($_POST['module_settings']), true);
+        // Module settings
+        $module_settings = isset($_POST['module_settings']) ? $_POST['module_settings'] : '';
+        if (is_string($module_settings)) {
+            $module_settings = json_decode(stripslashes($module_settings), true);
         }
         
-        // Ensure we get the correct settings
-        $show_category = isset($module_settings['show_category']) ? $module_settings['show_category'] : 'on';
-        $show_date = isset($module_settings['show_date']) ? $module_settings['show_date'] : 'on';
-        $show_excerpt = isset($module_settings['show_excerpt']) ? $module_settings['show_excerpt'] : 'on';
-        $excerpt_length = isset($module_settings['excerpt_length']) ? intval($module_settings['excerpt_length']) : 150;
-        $pagination_type = isset($module_settings['pagination_type']) ? $module_settings['pagination_type'] : 'load_more';
-        $load_more_text = isset($module_settings['load_more_text']) ? $module_settings['load_more_text'] : 'See more';
-        
-        // Build query args
+        // Query arguments
         $args = array(
-            'post_type' => $post_type,
+            'post_type'      => $post_type,
             'posts_per_page' => $posts_per_page,
-            'paged' => $page,
-            'post_status' => 'publish'
+            'post_status'    => 'publish',
+            'paged'          => $page,
         );
         
         // Add taxonomy query if category is selected
         if ($category_id !== 'all') {
-            $args['tax_query'] = array(
-                array(
-                    'taxonomy' => $taxonomy,
-                    'field' => 'term_id',
-                    'terms' => $category_id
-                )
-            );
+            $taxonomy = $this->get_taxonomy_for_post_type($post_type);
+            if ($taxonomy) {
+                $args['tax_query'] = array(
+                    array(
+                        'taxonomy' => $taxonomy,
+                        'field'    => 'term_id',
+                        'terms'    => $category_id,
+                    ),
+                );
+            }
         }
         
         // Get posts
@@ -695,112 +708,139 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Calculate total pages for pagination
         $total_pages = $query->max_num_pages;
+        $has_more = $page < $total_pages;
         
-        // Start building HTML response
-        $output = '';
+        // Start output buffer
+        ob_start();
         
-        // Posts grid
-        $output .= sprintf(
-            '<div class="gct-blog-posts-grid posts-per-row-%1$s">',
-            esc_attr($posts_per_row)
-        );
-        
-        // Loop through posts
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                
-                // Get featured image
-                $has_thumbnail = has_post_thumbnail();
-                $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
-                $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
-                
-                // Get date
-                $date = '';
-                if ($show_date === 'on') {
-                    $date = sprintf(
-                        '<div class="gct-post-date">%1$s</div>',
-                        esc_html(get_the_date())
-                    );
+        // If this is a load more request, just return the posts HTML
+        if ($load_more) {
+            if ($query->have_posts()) {
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $this->render_post_item();
                 }
-                
-                // Get excerpt
-                $excerpt = '';
-                if ($show_excerpt === 'on') {
-                    $raw_excerpt = get_the_excerpt();
-                    $trimmed_excerpt = wp_trim_words($raw_excerpt, $excerpt_length / 5, '...');
-                    $excerpt = sprintf(
-                        '<div class="gct-post-excerpt">%1$s</div>',
-                        esc_html($trimmed_excerpt)
-                    );
+                wp_reset_postdata();
+            }
+            $posts_html = ob_get_clean();
+            
+            wp_send_json_success(array(
+                'posts_html' => $posts_html,
+                'has_more'   => $has_more,
+            ));
+        } else {
+            // For regular filter, return the entire grid
+            if ($query->have_posts()) {
+                echo '<div class="gct-blog-posts-grid posts-per-row-' . esc_attr($module_settings['posts_per_row']) . '">';
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $this->render_post_item();
                 }
-                
-                // Build post item
-                $output .= '<article class="gct-post-item">';
-                
-                // Post thumbnail with overlay
-                $output .= sprintf(
-                    '<a href="%1$s" class="gct-post-thumbnail" %2$s>
-                        <div class="gct-post-overlay">
-                        </div>
-                    </a>',
-                    esc_url(get_permalink()),
-                    $thumbnail_style
-                );
-                
-                // Post content
-                $output .= '<div class="gct-post-content">';
-                
-                // Category below image 
-                if ($show_category === 'on' || $show_category === true) {
-                    $output .= '<span class="gct-post-category">BURIAL &amp; CREMATION</span>';
-                }
-                
-                // Post date
-                $output .= '<div class="gct-post-meta">';
-                $output .= $date;
-                $output .= '</div>';
-                
-                // Post title
-                $output .= sprintf(
-                    '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
-                    esc_url(get_permalink()),
-                    esc_html(get_the_title())
-                );
-                
-                // Post excerpt - only show if explicitly set to 'on'
-                if ($show_excerpt === 'on' || $show_excerpt === true) {
-                    $output .= $excerpt;
-                }
-                
-                // Close post content
-                $output .= '</div>';
-                
-                // Close post item
-                $output .= '</article>';
+                echo '</div>';
+                wp_reset_postdata();
+            } else {
+                echo '<p class="gct-no-posts">' . esc_html__('No posts found.', 'gct-blog-posts-module') . '</p>';
             }
             
-            // Reset post data
-            wp_reset_postdata();
-        } else {
-            $output .= '<p class="gct-no-posts">' . esc_html__('No posts found.', 'gct-blog-posts-module') . '</p>';
+            // Generate pagination
+            $pagination_html = '';
+            if ($module_settings['show_pagination']) {
+                $pagination_html = $this->generate_pagination($total_pages, $page, 'load_more', $module_settings['load_more_text']);
+            }
+            
+            $html = ob_get_clean();
+            
+            wp_send_json_success(array(
+                'html'       => $html,
+                'pagination' => $pagination_html,
+                'has_more'   => $has_more,
+            ));
+        }
+    }
+    
+    /**
+     * Helper function to render a post item
+     */
+    private function render_post_item() {
+        // Get featured image
+        $has_thumbnail = has_post_thumbnail();
+        $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
+        $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
+        
+        // Start post item
+        echo '<article class="gct-post-item">';
+        
+        // Post thumbnail with overlay
+        echo sprintf(
+            '<a href="%1$s" class="gct-post-thumbnail" %2$s>
+                <div class="gct-post-overlay">
+                </div>
+            </a>',
+            esc_url(get_permalink()),
+            $thumbnail_style
+        );
+        
+        // Post content
+        echo '<div class="gct-post-content">';
+        
+        // Get post type and determine if we should show category
+        $post_type = get_post_type();
+        $show_category = true; // Default to true
+        
+        // Get category
+        if ($show_category) {
+            if ($post_type === 'post') {
+                $post_categories = get_the_category();
+                if (!empty($post_categories)) {
+                    echo sprintf(
+                        '<span class="gct-post-category">%1$s</span>',
+                        esc_html($post_categories[0]->name)
+                    );
+                }
+            } else {
+                $taxonomies = get_object_taxonomies($post_type, 'objects');
+                if (!empty($taxonomies)) {
+                    $taxonomy_key = key($taxonomies);
+                    $terms = get_the_terms(get_the_ID(), $taxonomy_key);
+                    if (!empty($terms) && !is_wp_error($terms)) {
+                        echo sprintf(
+                            '<span class="gct-post-category">%1$s</span>',
+                            esc_html($terms[0]->name)
+                        );
+                    }
+                }
+            }
         }
         
-        // Close posts grid
-        $output .= '</div>';
+        // Post meta with date
+        echo '<div class="gct-post-meta">';
+        echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
+        echo '</div>';
         
-        // Add pagination if needed
-        if ($show_pagination !== 'off' && $total_pages > 1 && $page < $total_pages) {
-            $output .= $this->generate_pagination($total_pages, $page, 'load_more', $load_more_text);
+        // Post title
+        echo sprintf(
+            '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
+            esc_url(get_permalink()),
+            esc_html(get_the_title())
+        );
+        
+        // Post excerpt
+        $show_excerpt = true; // Default to true
+        if ($show_excerpt) {
+            $excerpt_length = 150;
+            $raw_excerpt = get_the_excerpt();
+            $trimmed_excerpt = wp_trim_words($raw_excerpt, $excerpt_length / 5, '...');
+            echo sprintf(
+                '<div class="gct-post-excerpt">%1$s</div>',
+                esc_html($trimmed_excerpt)
+            );
         }
         
-        // Send response
-        wp_send_json_success(array(
-            'success' => true,
-            'data' => array(
-                'html' => $output
-            )
-        ));
+        // Close post content
+        echo '</div>';
+        
+        // Close post item
+        echo '</article>';
     }
 }
 
