@@ -541,7 +541,41 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 
                 // Category below image 
                 if ($show_category === 'on' || $show_category === true) {
-                    $output .= '<span class="gct-post-category">BURIAL &amp; CREMATION</span>';
+                    if ($post_type === 'post') {
+                        $post_categories = get_the_category();
+                        if (!empty($post_categories)) {
+                            $output .= sprintf(
+                                '<span class="gct-post-category">%1$s</span>',
+                                esc_html($post_categories[0]->name)
+                            );
+                        }
+                    } else {
+                        $taxonomies = get_object_taxonomies($post_type, 'objects');
+                        if (!empty($taxonomies)) {
+                            $taxonomy_key = key($taxonomies);
+                            $terms = get_the_terms(get_the_ID(), $taxonomy_key);
+                            if (!empty($terms) && !is_wp_error($terms)) {
+                                $output .= sprintf(
+                                    '<span class="gct-post-category">%1$s</span>',
+                                    esc_html($terms[0]->name)
+                                );
+                            }
+                        }
+                    }
+                }
+                
+                // Check if post is in Event category and display event fields
+                $is_event_category = false;
+                if ($post_type === 'post') {
+                    $post_categories = get_the_category();
+                    if (!empty($post_categories)) {
+                        foreach ($post_categories as $category) {
+                            if (strtolower($category->name) === 'event' || $category->slug === 'event') {
+                                $is_event_category = true;
+                                break;
+                            }
+                        }
+                    }
                 }
                 
                 // Post date
@@ -555,6 +589,40 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                     esc_url(get_permalink()),
                     esc_html(get_the_title())
                 );
+                
+                // Check if post is in Event category and display event fields
+                if ($is_event_category) {
+                    // Get event date from custom field
+                    if ($show_event_date) {
+                        $event_date = get_post_meta(get_the_ID(), 'date', true);
+                        if (!empty($event_date)) {
+                            // Convert date format if it's in YYYYMMDD format
+                            if (preg_match('/^\d{8}$/', $event_date)) {
+                                $year = substr($event_date, 0, 4);
+                                $month = substr($event_date, 4, 2);
+                                $day = substr($event_date, 6, 2);
+                                $timestamp = mktime(0, 0, 0, $month, $day, $year);
+                                $event_date = date('F j, Y', $timestamp);
+                            }
+                            
+                            $output .= sprintf(
+                                '<div class="gct-event-date"><span class="gct-event-label">Event Date:</span> %1$s</div>',
+                                esc_html($event_date)
+                            );
+                        }
+                    }
+                    
+                    // Get event location from custom field
+                    if ($show_event_location) {
+                        $event_location = get_post_meta(get_the_ID(), 'location', true);
+                        if (!empty($event_location)) {
+                            $output .= sprintf(
+                                '<div class="gct-event-location"><span class="gct-event-label">Location:</span> %1$s</div>',
+                                esc_html($event_location)
+                            );
+                        }
+                    }
+                }
                 
                 // Post excerpt - only show if explicitly set to 'on'
                 if ($show_excerpt === 'on' || $show_excerpt === true) {
@@ -680,6 +748,18 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         ET_Builder_Element::set_style($render_slug, array(
             'selector'    => '%%order_class%% .gct-post-content',
             'declaration' => 'padding: 20px; flex-grow: 1; display: flex; flex-direction: column; border-top: none; overflow: hidden;',
+        ));
+        
+        // Event date and location styling
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-event-date, %%order_class%% .gct-event-location',
+            'declaration' => 'font-size: 14px; color: #666; margin-bottom: 8px; line-height: 1.4;',
+        ));
+        
+        // Event label styling
+        ET_Builder_Element::set_style($render_slug, array(
+            'selector'    => '%%order_class%% .gct-event-label',
+            'declaration' => 'font-weight: 600; color: #254B45;',
         ));
         
         // Post title hover
@@ -816,6 +896,9 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             }
         }
         
+        // Flag to check if post is in Event category
+        $is_event_category = false;
+        
         // Start post item
         echo '<article class="gct-post-item">';
         
@@ -835,9 +918,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Get post type and determine if we should show category
         $post_type = get_post_type();
         $show_category = true; // Default to true
-        
-        // Flag to check if post is in Event category
-        $is_event_category = false;
         
         // Get category
         if ($show_category) {
@@ -872,13 +952,33 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             }
         }
         
+        // Post meta with date
+        echo '<div class="gct-post-meta">';
+        echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
+        echo '</div>';
+        
+        // Post title
+        echo sprintf(
+            '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
+            esc_url(get_permalink()),
+            esc_html(get_the_title())
+        );
+        
         // Check if we need to display event data (for posts in Event category)
         if ($is_event_category) {
             // Get event date from custom field
             if ($show_event_date) {
                 $event_date = get_post_meta(get_the_ID(), 'date', true);
                 if (!empty($event_date)) {
-                    // The date is already formatted from the custom field
+                    // Convert date format if it's in YYYYMMDD format
+                    if (preg_match('/^\d{8}$/', $event_date)) {
+                        $year = substr($event_date, 0, 4);
+                        $month = substr($event_date, 4, 2);
+                        $day = substr($event_date, 6, 2);
+                        $timestamp = mktime(0, 0, 0, $month, $day, $year);
+                        $event_date = date('F j, Y', $timestamp);
+                    }
+                    
                     echo sprintf(
                         '<div class="gct-event-date"><span class="gct-event-label">Event Date:</span> %1$s</div>',
                         esc_html($event_date)
@@ -897,18 +997,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 }
             }
         }
-        
-        // Post meta with date
-        echo '<div class="gct-post-meta">';
-        echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
-        echo '</div>';
-        
-        // Post title
-        echo sprintf(
-            '<h3 class="gct-post-title"><a href="%1$s">%2$s</a></h3>',
-            esc_url(get_permalink()),
-            esc_html(get_the_title())
-        );
         
         // Post excerpt
         $show_excerpt = true; // Default to true

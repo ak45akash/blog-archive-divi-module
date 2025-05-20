@@ -204,6 +204,7 @@ h1, h2, h3, h4, h5, h6, p, button, a {
     color: #666 !important;
     margin-bottom: 8px !important;
     line-height: 1.4 !important;
+    margin-top: 5px !important;
 }
 
 .gct-event-label {
