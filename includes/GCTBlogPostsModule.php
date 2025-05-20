@@ -387,16 +387,16 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Store module settings as data attributes for AJAX consistency
         $module_settings = htmlspecialchars(json_encode(array(
-            'show_category' => $show_category,
-            'show_date' => $show_date,
-            'show_excerpt' => $show_excerpt,
+            'show_category' => $this->props['show_category'],
+            'show_date' => $this->props['show_date'],
+            'show_excerpt' => $this->props['show_excerpt'],
             'excerpt_length' => $excerpt_length,
             'posts_per_row' => $posts_per_row,
-            'show_pagination' => $show_pagination,
+            'show_pagination' => $this->props['show_pagination'],
             'pagination_type' => $pagination_type,
             'load_more_text' => $load_more_text,
-            'show_event_date' => $show_event_date,
-            'show_event_location' => $show_event_location,
+            'show_event_date' => $this->props['show_event_date'],
+            'show_event_location' => $this->props['show_event_location'],
         )), ENT_QUOTES, 'UTF-8');
         
         // Determine current page and category
@@ -540,7 +540,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 $excerpt = '';
                 if ($show_excerpt) {
                     $raw_excerpt = get_the_excerpt();
-                    $trimmed_excerpt = wp_trim_words($raw_excerpt, $excerpt_length / 5, '...');
+                    $cleaned_excerpt = $this->clean_content($raw_excerpt);
+                    $trimmed_excerpt = wp_trim_words($cleaned_excerpt, $excerpt_length / 5, '...');
                     $excerpt = sprintf(
                         '<div class="gct-post-excerpt">%1$s</div>',
                         esc_html($trimmed_excerpt)
@@ -821,15 +822,30 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             $module_settings = array();
         }
         
-        // Set default values if missing
+        // Set default values if missing (using 'on'/'off' format to match Divi's format)
         if (!isset($module_settings['posts_per_row'])) {
             $module_settings['posts_per_row'] = 3;
         }
         if (!isset($module_settings['show_pagination'])) {
-            $module_settings['show_pagination'] = true;
+            $module_settings['show_pagination'] = 'on';
         }
         if (!isset($module_settings['load_more_text'])) {
             $module_settings['load_more_text'] = 'See more';
+        }
+        if (!isset($module_settings['show_excerpt'])) {
+            $module_settings['show_excerpt'] = 'on';
+        }
+        if (!isset($module_settings['show_date'])) {
+            $module_settings['show_date'] = 'on';
+        }
+        if (!isset($module_settings['show_category'])) {
+            $module_settings['show_category'] = 'on';
+        }
+        if (!isset($module_settings['show_event_date'])) {
+            $module_settings['show_event_date'] = 'on';
+        }
+        if (!isset($module_settings['show_event_location'])) {
+            $module_settings['show_event_location'] = 'on';
         }
         
         // Set global variable for module settings to be used in render_post_item
@@ -900,7 +916,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             
             // Generate pagination
             $pagination_html = '';
-            if (isset($module_settings['show_pagination']) && $module_settings['show_pagination']) {
+            if (isset($module_settings['show_pagination']) && $module_settings['show_pagination'] === 'on') {
                 $load_more_text = isset($module_settings['load_more_text']) ? $module_settings['load_more_text'] : 'See more';
                 $pagination_type = isset($module_settings['pagination_type']) ? $module_settings['pagination_type'] : 'load_more';
                 $pagination_html = $this->generate_pagination($total_pages, $page, $pagination_type, $load_more_text);
@@ -917,6 +933,19 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
     }
     
     /**
+     * Helper function to clean up raw content and remove shortcodes
+     */
+    private function clean_content($content) {
+        // Remove Divi shortcodes and other potentially problematic markup
+        $content = preg_replace('/\[\/?et_pb.*?\]/', '', $content);
+        $content = preg_replace('/\[\/?div.*?\]/', '', $content); 
+        $content = preg_replace('/\[\/?section.*?\]/', '', $content);
+        $content = wp_strip_all_tags($content);
+        
+        return $content;
+    }
+    
+    /**
      * Helper function to render a post item
      */
     private function render_post_item() {
@@ -925,23 +954,42 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $thumbnail = $has_thumbnail ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
         $thumbnail_style = $has_thumbnail ? sprintf('style="background-image:url(%1$s);"', esc_url($thumbnail)) : '';
         
-        // Get module settings
+        // Get module settings with proper defaults
+        $show_category = true;
+        $show_date = true;
+        $show_excerpt = true;
         $show_event_date = true;
         $show_event_location = true;
         
         // AJAX handling - get settings from global variable if they exist
         global $gct_blog_posts_settings;
         if (isset($gct_blog_posts_settings)) {
+            if (isset($gct_blog_posts_settings['show_category'])) {
+                $show_category = $gct_blog_posts_settings['show_category'] === 'on';
+            }
+            if (isset($gct_blog_posts_settings['show_date'])) {
+                $show_date = $gct_blog_posts_settings['show_date'] === 'on';
+            }
+            if (isset($gct_blog_posts_settings['show_excerpt'])) {
+                $show_excerpt = $gct_blog_posts_settings['show_excerpt'] === 'on';
+            }
             if (isset($gct_blog_posts_settings['show_event_date'])) {
-                $show_event_date = $gct_blog_posts_settings['show_event_date'];
+                $show_event_date = $gct_blog_posts_settings['show_event_date'] === 'on';
             }
             if (isset($gct_blog_posts_settings['show_event_location'])) {
-                $show_event_location = $gct_blog_posts_settings['show_event_location'];
+                $show_event_location = $gct_blog_posts_settings['show_event_location'] === 'on';
             }
         }
         
         // Flag to check if post is in Event category
         $is_event_category = false;
+        
+        // Get excerpt for later use
+        $excerpt = '';
+        $excerpt_length = 150; // Default length
+        $raw_excerpt = get_the_excerpt();
+        $cleaned_excerpt = $this->clean_content($raw_excerpt);
+        $trimmed_excerpt = wp_trim_words($cleaned_excerpt, $excerpt_length / 5, '...');
         
         // Start post item with consistent classes
         echo '<article class="gct-post-item">';
@@ -961,9 +1009,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Get post type and determine if we should show category
         $post_type = get_post_type();
-        $show_category = true; // Default to true
         
-        // Get category
+        // Get category (only if show_category is true)
         if ($show_category) {
             if ($post_type === 'post') {
                 $post_categories = get_the_category();
@@ -996,10 +1043,12 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             }
         }
         
-        // Post meta with date
-        echo '<div class="gct-post-meta">';
-        echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
-        echo '</div>';
+        // Post meta with date (only if show_date is true)
+        if ($show_date) {
+            echo '<div class="gct-post-meta">';
+            echo sprintf('<div class="gct-post-date">%1$s</div>', esc_html(get_the_date()));
+            echo '</div>';
+        }
         
         // Post title
         echo sprintf(
@@ -1008,7 +1057,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             esc_html(get_the_title())
         );
         
-        // Check if we need to display event data (for posts in Event category)
+        // Check if post is in Event category and we need to display event data
         if ($is_event_category) {
             // Get event date from custom field
             if ($show_event_date) {
@@ -1042,12 +1091,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             }
         }
         
-        // Post excerpt
-        $show_excerpt = true; // Default to true
+        // Post excerpt - only show if show_excerpt is true
         if ($show_excerpt) {
-            $excerpt_length = 150;
-            $raw_excerpt = get_the_excerpt();
-            $trimmed_excerpt = wp_trim_words($raw_excerpt, $excerpt_length / 5, '...');
             echo sprintf(
                 '<div class="gct-post-excerpt">%1$s</div>',
                 esc_html($trimmed_excerpt)

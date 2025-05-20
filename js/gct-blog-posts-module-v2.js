@@ -28,11 +28,20 @@
             var moduleSettings = $container.data('module-settings');
             var taxonomy = $select.data('taxonomy') || 'category';
             
+            // Parse module settings if needed
+            if (typeof moduleSettings === 'string') {
+                try {
+                    moduleSettings = JSON.parse(moduleSettings);
+                } catch(e) {
+                    console.error('Error parsing module settings:', e);
+                }
+            }
+            
             // Update URL parameter without reloading
             updateUrlParam('gct_category', categoryId);
             
             // Store the current posts per row value to maintain grid layout
-            var currentPostsPerRow = $container.find('.gct-blog-posts-grid').attr('class').match(/posts-per-row-(\d+)/)[1];
+            var currentPostsPerRow = $container.find('.gct-blog-posts-grid').attr('class').match(/posts-per-row-(\d+)/)?.[1] || 3;
             
             // Show loading state immediately
             $postsWrapper.addClass('loading');
@@ -56,15 +65,18 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        // Update posts wrapper
+                        // Update posts wrapper with the AJAX response
                         $postsWrapper.html(response.data.html);
                         
                         // Ensure the correct posts-per-row class is maintained
                         $postsWrapper.find('.gct-blog-posts-grid').addClass('posts-per-row-' + currentPostsPerRow);
                         
-                        // Ensure post items have the correct styling
+                        // Process all posts to ensure proper styling and clean content
                         $postsWrapper.find('.gct-post-item').each(function() {
                             var $post = $(this);
+                            
+                            // Clean up any raw code that might be displayed
+                            sanitizePostContent($post);
                             
                             // Make sure all posts have the right structure
                             if (!$post.find('.gct-post-overlay').length) {
@@ -77,13 +89,20 @@
                                 'flex-direction': 'column'
                             });
                             
-                            // Ensure category has proper styling
-                            $post.find('.gct-post-category').css({
-                                'color': '#F7941C',
-                                'font-weight': '600',
-                                'text-transform': 'uppercase',
-                                'letter-spacing': '0.5px'
-                            });
+                            // Apply visibility rules based on module settings
+                            if (moduleSettings) {
+                                if (moduleSettings.show_category !== 'on') {
+                                    $post.find('.gct-post-category').hide();
+                                }
+                                
+                                if (moduleSettings.show_date !== 'on') {
+                                    $post.find('.gct-post-meta').hide();
+                                }
+                                
+                                if (moduleSettings.show_excerpt !== 'on') {
+                                    $post.find('.gct-post-excerpt').hide();
+                                }
+                            }
                         });
                         
                         // Apply any module settings that might be needed
@@ -270,6 +289,15 @@
         // Get module settings from data attribute to maintain consistency
         let moduleSettings = $container.data('module-settings');
         
+        // Parse module settings if needed
+        if (typeof moduleSettings === 'string') {
+            try {
+                moduleSettings = JSON.parse(moduleSettings);
+            } catch(e) {
+                console.error('Error parsing module settings:', e);
+            }
+        }
+        
         const data = {
             action: 'gct_get_filtered_posts',
             nonce: gct_blog_posts_params.nonce,
@@ -295,6 +323,9 @@
                         // Properly style each new post before appending
                         $newPosts.each(function() {
                             const $post = $(this);
+                            
+                            // Clean up any raw code that might be displayed
+                            sanitizePostContent($post);
                             
                             // Make sure overlay is correct
                             if (!$post.find('.gct-post-overlay').length) {
@@ -333,6 +364,9 @@
                         // Ensure all posts have the correct styling
                         $postsWrapper.find('.gct-post-item').each(function() {
                             const $post = $(this);
+                            
+                            // Clean up any raw code that might be displayed
+                            sanitizePostContent($post);
                             
                             // Make sure all posts have the right structure
                             if (!$post.find('.gct-post-overlay').length) {
@@ -388,14 +422,19 @@
         
         const $posts = $container.find('.gct-post-item');
         
-        // Apply visibility settings
-        if (settings.show_excerpt === 'off') {
+        // Apply visibility settings - properly handle 'on'/'off' string values
+        const showExcerpt = settings.show_excerpt === 'on';
+        const showDate = settings.show_date === 'on';
+        const showCategory = settings.show_category === 'on';
+        
+        // Set visibility based on settings
+        if (!showExcerpt) {
             $posts.find('.gct-post-excerpt').hide();
         } else {
             $posts.find('.gct-post-excerpt').show();
         }
         
-        if (settings.show_date === 'off') {
+        if (!showDate) {
             $posts.find('.gct-post-date').hide();
             $posts.find('.gct-post-meta').hide();
         } else {
@@ -403,7 +442,7 @@
             $posts.find('.gct-post-meta').show();
         }
         
-        if (settings.show_category === 'off') {
+        if (!showCategory) {
             $posts.find('.gct-post-meta-top').hide();
             $posts.find('.gct-post-category').hide();
         } else {
@@ -414,6 +453,9 @@
         // Apply specific styles for event category posts
         $posts.each(function() {
             const $post = $(this);
+            
+            // Clean up any raw code that might be displayed
+            sanitizePostContent($post);
             
             // Check for event date/location elements to identify event posts
             if ($post.find('.gct-event-date, .gct-event-location').length > 0) {
@@ -445,6 +487,53 @@
                 'color': '#666',
                 'margin-top': 'auto'
             });
+        });
+    }
+    
+    /**
+     * Clean up any raw code that might be displayed in post content
+     */
+    function sanitizePostContent($post) {
+        // Check for unwrapped shortcodes or raw HTML in post content
+        const $content = $post.find('.gct-post-content');
+        
+        // If there's any unwrapped text that looks like a shortcode or HTML tag
+        $content.contents().each(function() {
+            if (this.nodeType === Node.TEXT_NODE) {
+                const text = this.textContent.trim();
+                // Check if this looks like a shortcode or tag
+                if (text.indexOf('[et_pb') !== -1 || 
+                    text.indexOf('<div') !== -1 || 
+                    text.indexOf('<section') !== -1 ||
+                    text.match(/\[.*?\]/)) {
+                    // Remove it
+                    $(this).remove();
+                }
+            }
+        });
+        
+        // Look for any elements that might contain raw code
+        $content.find('*').each(function() {
+            const $this = $(this);
+            // Get the direct text content, not including children
+            const textContent = $this.contents().filter(function() {
+                return this.nodeType === Node.TEXT_NODE;
+            }).text().trim();
+            
+            // Check if this looks like a shortcode or tag
+            if (textContent.indexOf('[et_pb') !== -1 || 
+                textContent.indexOf('<div') !== -1 || 
+                textContent.match(/\[.*?\]/)) {
+                // Remove only the text nodes with raw code
+                $this.contents().filter(function() {
+                    return this.nodeType === Node.TEXT_NODE;
+                }).each(function() {
+                    const text = this.textContent.trim();
+                    if (text.indexOf('[') !== -1 || text.indexOf('<') !== -1) {
+                        $(this).remove();
+                    }
+                });
+            }
         });
     }
     
