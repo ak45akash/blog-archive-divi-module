@@ -176,8 +176,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 ),
                 'default'         => 'on',
                 'toggle_slug'     => 'elements',
-                'show_if'         => array('post_type' => 'event'),
-                'description'     => esc_html__('Show the event date from custom field.', 'gct-blog-posts-module'),
+                'description'     => esc_html__('Show the event date from custom field for posts in the Event category.', 'gct-blog-posts-module'),
             ),
             'show_event_location' => array(
                 'label'           => esc_html__('Show Event Location', 'gct-blog-posts-module'),
@@ -189,8 +188,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
                 ),
                 'default'         => 'on',
                 'toggle_slug'     => 'elements',
-                'show_if'         => array('post_type' => 'event'),
-                'description'     => esc_html__('Show the event location from custom field.', 'gct-blog-posts-module'),
+                'description'     => esc_html__('Show the event location from custom field for posts in the Event category.', 'gct-blog-posts-module'),
             ),
             'excerpt_length' => array(
                 'label'           => esc_html__('Excerpt Length', 'gct-blog-posts-module'),
@@ -838,11 +836,22 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $post_type = get_post_type();
         $show_category = true; // Default to true
         
+        // Flag to check if post is in Event category
+        $is_event_category = false;
+        
         // Get category
         if ($show_category) {
             if ($post_type === 'post') {
                 $post_categories = get_the_category();
                 if (!empty($post_categories)) {
+                    // Check if any category is "Event"
+                    foreach ($post_categories as $category) {
+                        if (strtolower($category->name) === 'event' || $category->slug === 'event') {
+                            $is_event_category = true;
+                            break;
+                        }
+                    }
+                    
                     echo sprintf(
                         '<span class="gct-post-category">%1$s</span>',
                         esc_html($post_categories[0]->name)
@@ -863,8 +872,8 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             }
         }
         
-        // Check if we need to display event data
-        if ($post_type === 'event') {
+        // Check if we need to display event data (for posts in Event category)
+        if ($is_event_category) {
             // Get event date from custom field
             if ($show_event_date) {
                 $event_date = get_post_meta(get_the_ID(), 'date', true);
