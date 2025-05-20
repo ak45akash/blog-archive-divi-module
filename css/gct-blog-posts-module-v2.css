@@ -6,7 +6,7 @@
 
 /* Base font styles */
 .gct_blog_posts, 
-.gct-module-title,
+.gct-blog-post-module-title,
 .gct-post-category,
 .gct-post-date,
 .gct-post-title,
@@ -26,7 +26,7 @@ h1, h2, h3, h4, h5, h6, p, button, a {
 }
 
 /* Module title styling */
-.gct-module-title {
+.gct-blog-post-module-title {
     text-align: left !important;
     margin-bottom: 20px;
     font-size: 32px !important;
@@ -106,7 +106,7 @@ h1, h2, h3, h4, h5, h6, p, button, a {
 .gct-post-item {
     transition: all 0.3s ease !important;
     position: relative !important;
-    border-radius: 0 !important;
+    border-radius: 20px !important;
     overflow: hidden !important;
     box-shadow: 0 1px 5px rgba(0,0,0,0.08) !important;
     background-color: #fff !important;
@@ -116,7 +116,7 @@ h1, h2, h3, h4, h5, h6, p, button, a {
 
 .gct-post-item:hover {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important;
-    transform: translateY(-3px) !important;
+    /* transform: translateY(-3px) !important; */
 }
 
 .gct-post-item:hover .gct-post-title a {

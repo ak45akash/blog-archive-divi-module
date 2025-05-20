@@ -408,7 +408,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Module title (left-aligned)
         if (!empty($module_title)) {
-            $output .= sprintf('<h2 class="gct-module-title" style="text-align: left;">%1$s</h2>', esc_html($module_title));
+            $output .= sprintf('<h2 class="gct-blog-post-module-title" style="text-align: left;">%1$s</h2>', esc_html($module_title));
         }
         
         // Category filter

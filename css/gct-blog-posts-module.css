@@ -5,7 +5,7 @@
 
 /* Base font styles */
 .gct_blog_posts, 
-.gct-module-title,
+.gct-blog-post-module-title,
 .gct-post-category,
 .gct-post-date,
 .gct-post-title,
@@ -24,7 +24,7 @@
 }
 
 /* Module title styling */
-.gct-module-title {
+.gct-blog-post-module-title {
     text-align: start;
     margin-bottom: 30px;
     font-size: 32px;
