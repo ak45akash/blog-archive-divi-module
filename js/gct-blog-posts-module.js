@@ -77,6 +77,9 @@
             $loadMoreButton.text('Loading...').addClass('loading');
         }
         
+        // Get module settings from data attribute to maintain consistency
+        let moduleSettings = $container.data('module-settings');
+        
         const data = {
             action: 'gct_get_filtered_posts',
             nonce: gct_blog_posts_params.nonce,
@@ -84,7 +87,8 @@
             taxonomy: taxonomy,
             category_id: categoryId,
             posts_per_page: postsPerPage,
-            page: page
+            page: page,
+            module_settings: moduleSettings
         };
         
         $.ajax({
@@ -98,6 +102,24 @@
                         // Extract the posts from the HTML response
                         const $newContent = $(response.data.html);
                         const $newPosts = $newContent.find('.gct-post-item');
+                        
+                        // Make sure all new posts have the correct structure
+                        $newPosts.each(function() {
+                            const $post = $(this);
+                            
+                            // Ensure all posts have the post overlay
+                            if ($post.find('.gct-post-thumbnail .gct-post-overlay').length === 0) {
+                                $post.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
+                            }
+                            
+                            // Ensure the proper structure for post meta, categories, and excerpt
+                            if ($post.find('.gct-post-meta').length === 0) {
+                                const $date = $post.find('.gct-post-date');
+                                if ($date.length && !$date.closest('.gct-post-meta').length) {
+                                    $date.wrap('<div class="gct-post-meta"></div>');
+                                }
+                            }
+                        });
                         
                         // Append the new posts to the existing grid
                         $container.find('.gct-blog-posts-grid').append($newPosts);
