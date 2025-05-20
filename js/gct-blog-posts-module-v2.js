@@ -13,18 +13,32 @@
             initGCTBlogPostsModule();
         });
 
+        // Remove duplicate event handlers to prevent conflicts
+        $(document).off('change', '.gct-category-filter');
+        $(document).off('change', '.gct-category-select');
+        
         // Handle category filter change
-        $('.gct-category-filter').on('change', function() {
-            var $filter = $(this);
-            var $container = $filter.closest('.gct-blog-posts-container');
+        $(document).on('change', '.gct-category-select', function() {
+            var $select = $(this);
+            var $container = $select.closest('.gct-blog-posts-container');
             var $postsWrapper = $container.find('.gct-posts-wrapper');
-            var postType = $filter.data('post-type');
-            var categoryId = $filter.val();
+            var postType = $container.data('post-type');
+            var categoryId = $select.val();
             var postsPerPage = $container.data('posts-per-page');
             var moduleSettings = $container.data('module-settings');
+            var taxonomy = $select.data('taxonomy') || 'category';
             
-            // Show loading state
+            // Update URL parameter without reloading
+            updateUrlParam('gct_category', categoryId);
+            
+            // Store the current posts per row value to maintain grid layout
+            var currentPostsPerRow = $container.find('.gct-blog-posts-grid').attr('class').match(/posts-per-row-(\d+)/)[1];
+            
+            // Show loading state immediately
             $postsWrapper.addClass('loading');
+            
+            // Clear existing content to show loading state more clearly
+            $postsWrapper.find('.gct-blog-posts-grid').html('<div class="loading-indicator"></div>');
             
             // Make AJAX request
             $.ajax({
@@ -35,6 +49,7 @@
                     nonce: gct_blog_posts_params.nonce,
                     post_type: postType,
                     category_id: categoryId,
+                    taxonomy: taxonomy,
                     posts_per_page: postsPerPage,
                     page: 1,
                     module_settings: moduleSettings
@@ -43,10 +58,42 @@
                     if (response.success) {
                         // Update posts wrapper
                         $postsWrapper.html(response.data.html);
+                        
+                        // Ensure the correct posts-per-row class is maintained
+                        $postsWrapper.find('.gct-blog-posts-grid').addClass('posts-per-row-' + currentPostsPerRow);
+                        
+                        // Ensure post items have the correct styling
+                        $postsWrapper.find('.gct-post-item').each(function() {
+                            var $post = $(this);
+                            
+                            // Make sure all posts have the right structure
+                            if (!$post.find('.gct-post-overlay').length) {
+                                $post.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
+                            }
+                            
+                            // Ensure post content is set to flex
+                            $post.find('.gct-post-content').css({
+                                'display': 'flex',
+                                'flex-direction': 'column'
+                            });
+                            
+                            // Ensure category has proper styling
+                            $post.find('.gct-post-category').css({
+                                'color': '#F7941C',
+                                'font-weight': '600',
+                                'text-transform': 'uppercase',
+                                'letter-spacing': '0.5px'
+                            });
+                        });
+                        
+                        // Apply any module settings that might be needed
+                        applyModuleSettings($container, moduleSettings);
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
+                    // Show error message in the posts wrapper
+                    $postsWrapper.html('<p class="gct-no-posts">Error loading posts. Please try again.</p>');
                 },
                 complete: function() {
                     $postsWrapper.removeClass('loading');
@@ -114,22 +161,6 @@
     function initGCTBlogPostsModule() {
         $('.gct_blog_posts').each(function() {
             const $module = $(this);
-            
-            // Handle category filter change
-            $module.find('.gct-category-select').on('change', function() {
-                const $select = $(this);
-                const $container = $select.closest('.gct-blog-posts-container');
-                const postType = $container.data('post-type');
-                const postsPerPage = $container.data('posts-per-page');
-                const taxonomy = $select.data('taxonomy');
-                const categoryId = $select.val();
-                
-                // Update URL parameter without reloading
-                updateUrlParam('gct_category', categoryId);
-                
-                // When changing category, reset to page 1 and replace content
-                getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, 1, false);
-            });
             
             // Handle "See more" button clicks
             $module.find('.gct-pagination').on('click', '.gct-load-more', function(e) {
@@ -224,11 +255,16 @@
      */
     function getFilteredPosts($container, postType, taxonomy, categoryId, postsPerPage, page, append = false) {
         const $postsWrapper = $container.find('.gct-posts-wrapper');
-        const $loadMoreButton = $container.find('.gct-load-more');
         
-        // Add loading state
-        if ($loadMoreButton.length) {
-            $loadMoreButton.text('Loading...').addClass('loading');
+        // Store the current posts per row value to maintain grid layout
+        const currentPostsPerRow = $container.find('.gct-blog-posts-grid').attr('class').match(/posts-per-row-(\d+)/)?.[1] || 3;
+        
+        // Add loading state to wrapper
+        $postsWrapper.addClass('loading');
+        
+        // If not appending, show loading indicator
+        if (!append) {
+            $postsWrapper.find('.gct-blog-posts-grid').html('<div class="loading-indicator"></div>');
         }
         
         // Get module settings from data attribute to maintain consistency
@@ -242,7 +278,8 @@
             category_id: categoryId,
             posts_per_page: postsPerPage,
             page: page,
-            module_settings: moduleSettings
+            module_settings: moduleSettings,
+            load_more: append
         };
         
         $.ajax({
@@ -253,147 +290,161 @@
                 if (response.success) {
                     if (append) {
                         // Extract and append the new posts only
-                        const $newContent = $(response.data.html);
-                        const $newPosts = $newContent.find('.gct-post-item');
+                        const $newPosts = $(response.data.posts_html);
                         
-                        // Ensure new posts have the correct structure and styling before appending
+                        // Properly style each new post before appending
                         $newPosts.each(function() {
                             const $post = $(this);
                             
-                            // Make sure overlay has the correct structure
-                            const $thumbnail = $post.find('.gct-post-thumbnail');
-                            const $overlay = $thumbnail.find('.gct-post-overlay');
-                            
-                            // If overlay is missing or malformed, recreate it
-                            if ($overlay.length === 0) {
-                                $thumbnail.append('<div class="gct-post-overlay"></div>');
+                            // Make sure overlay is correct
+                            if (!$post.find('.gct-post-overlay').length) {
+                                $post.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
                             }
                             
-                            // Ensure category tag has correct positioning
-                            const $metaTop = $post.find('.gct-post-meta-top');
-                            if ($metaTop.length && !$metaTop.is(':visible')) {
-                                $metaTop.css('display', 'block');
-                            }
+                            // Ensure post content is set to flex
+                            $post.find('.gct-post-content').css({
+                                'display': 'flex',
+                                'flex-direction': 'column'
+                            });
                             
-                            // Ensure metadata is properly displayed
-                            const $postContent = $post.find('.gct-post-content');
-                            const $meta = $postContent.find('.gct-post-meta');
-                            if ($meta.length === 0) {
-                                $postContent.prepend('<div class="gct-post-meta"></div>');
-                            }
+                            // Ensure category has proper styling
+                            $post.find('.gct-post-category').css({
+                                'color': '#F7941C',
+                                'font-weight': '600',
+                                'text-transform': 'uppercase',
+                                'letter-spacing': '0.5px'
+                            });
                         });
-                        
-                        // Preserve module settings for show/hide elements
-                        if (moduleSettings) {
-                            const settings = typeof moduleSettings === 'string' 
-                                ? JSON.parse(moduleSettings) 
-                                : moduleSettings;
-                                
-                            // IMPORTANT: For "on" values, we explicitly show the elements to ensure they're visible
-                            if (settings.show_excerpt === 'off') {
-                                $newPosts.find('.gct-post-excerpt').hide();
-                            } else {
-                                $newPosts.find('.gct-post-excerpt').show();
-                            }
-                            
-                            if (settings.show_date === 'off') {
-                                $newPosts.find('.gct-post-date').hide();
-                            } else {
-                                // Explicitly show the date elements
-                                $newPosts.find('.gct-post-date').show();
-                                // Also ensure the .gct-post-meta container is visible
-                                $newPosts.find('.gct-post-meta').show();
-                            }
-                            
-                            if (settings.show_category === 'off') {
-                                $newPosts.find('.gct-post-meta-top').hide();
-                                $newPosts.find('.gct-post-category').hide();
-                            } else {
-                                // Explicitly show the category elements
-                                $newPosts.find('.gct-post-meta-top').show();
-                                $newPosts.find('.gct-post-category').show();
-                            }
-                        }
                         
                         // Append the new posts to the existing grid
                         $container.find('.gct-blog-posts-grid').append($newPosts);
                         
-                        // Update pagination
-                        const $newPagination = $newContent.find('.gct-pagination');
-                        if ($newPagination.length === 0) {
+                        // Update button state
+                        if (!response.data.has_more) {
                             $container.find('.gct-pagination').remove();
-                        } else {
-                            $container.find('.gct-pagination').replaceWith($newPagination);
                         }
                     } else {
-                        // Replace the entire content but preserve module settings
+                        // Replace the entire content
                         $postsWrapper.html(response.data.html);
                         
-                        // Ensure all posts in the new content have proper structure
+                        // Ensure the grid has the correct posts-per-row class
+                        $postsWrapper.find('.gct-blog-posts-grid').addClass('posts-per-row-' + currentPostsPerRow);
+                        
+                        // Ensure all posts have the correct styling
                         $postsWrapper.find('.gct-post-item').each(function() {
                             const $post = $(this);
                             
-                            // Make sure overlay has the correct structure
-                            const $thumbnail = $post.find('.gct-post-thumbnail');
-                            const $overlay = $thumbnail.find('.gct-post-overlay');
-                            
-                            // If overlay is missing or malformed, recreate it
-                            if ($overlay.length === 0) {
-                                $thumbnail.append('<div class="gct-post-overlay"></div>');
+                            // Make sure all posts have the right structure
+                            if (!$post.find('.gct-post-overlay').length) {
+                                $post.find('.gct-post-thumbnail').append('<div class="gct-post-overlay"></div>');
                             }
                             
-                            // Ensure category tag has correct positioning
-                            const $metaTop = $post.find('.gct-post-meta-top');
-                            if ($metaTop.length && !$metaTop.is(':visible')) {
-                                $metaTop.css('display', 'block');
-                            }
+                            // Ensure post content is set to flex
+                            $post.find('.gct-post-content').css({
+                                'display': 'flex',
+                                'flex-direction': 'column'
+                            });
+                            
+                            // Ensure category has proper styling
+                            $post.find('.gct-post-category').css({
+                                'color': '#F7941C',
+                                'font-weight': '600',
+                                'text-transform': 'uppercase',
+                                'letter-spacing': '0.5px'
+                            });
                         });
-                        
-                        // Apply module settings after content refresh
-                        if (moduleSettings) {
-                            const settings = typeof moduleSettings === 'string' 
-                                ? JSON.parse(moduleSettings) 
-                                : moduleSettings;
-                                
-                            // IMPORTANT: For "on" values, we explicitly show the elements to ensure they're visible
-                            if (settings.show_excerpt === 'off') {
-                                $postsWrapper.find('.gct-post-excerpt').hide();
-                            } else {
-                                $postsWrapper.find('.gct-post-excerpt').show();
-                            }
-                            
-                            if (settings.show_date === 'off') {
-                                $postsWrapper.find('.gct-post-date').hide();
-                            } else {
-                                // Explicitly show the date elements
-                                $postsWrapper.find('.gct-post-date').show();
-                                // Also ensure the .gct-post-meta container is visible
-                                $postsWrapper.find('.gct-post-meta').show();
-                            }
-                            
-                            if (settings.show_category === 'off') {
-                                $postsWrapper.find('.gct-post-meta-top').hide();
-                                $postsWrapper.find('.gct-post-category').hide();
-                            } else {
-                                // Explicitly show the category elements
-                                $postsWrapper.find('.gct-post-meta-top').show();
-                                $postsWrapper.find('.gct-post-category').show();
-                            }
-                        }
                     }
-                }
-                
-                // Remove loading state if the button still exists
-                if ($loadMoreButton.length) {
-                    $loadMoreButton.removeClass('loading');
+                    
+                    // Apply any module settings that might be needed
+                    applyModuleSettings($container, moduleSettings);
+                } else {
+                    console.error('Error loading posts:', response.data?.message || 'Unknown error');
                 }
             },
-            error: function() {
-                // Remove loading state
-                if ($loadMoreButton.length) {
-                    $loadMoreButton.text('See more').removeClass('loading');
-                }
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
+            },
+            complete: function() {
+                $postsWrapper.removeClass('loading');
             }
+        });
+    }
+    
+    /**
+     * Apply module settings to control visibility of elements
+     */
+    function applyModuleSettings($container, settings) {
+        // Parse settings if they're a string
+        if (typeof settings === 'string') {
+            try {
+                settings = JSON.parse(settings);
+            } catch (e) {
+                console.error('Error parsing module settings:', e);
+                return;
+            }
+        }
+        
+        if (!settings) return;
+        
+        const $posts = $container.find('.gct-post-item');
+        
+        // Apply visibility settings
+        if (settings.show_excerpt === 'off') {
+            $posts.find('.gct-post-excerpt').hide();
+        } else {
+            $posts.find('.gct-post-excerpt').show();
+        }
+        
+        if (settings.show_date === 'off') {
+            $posts.find('.gct-post-date').hide();
+            $posts.find('.gct-post-meta').hide();
+        } else {
+            $posts.find('.gct-post-date').show();
+            $posts.find('.gct-post-meta').show();
+        }
+        
+        if (settings.show_category === 'off') {
+            $posts.find('.gct-post-meta-top').hide();
+            $posts.find('.gct-post-category').hide();
+        } else {
+            $posts.find('.gct-post-meta-top').show();
+            $posts.find('.gct-post-category').show();
+        }
+        
+        // Apply specific styles for event category posts
+        $posts.each(function() {
+            const $post = $(this);
+            
+            // Check for event date/location elements to identify event posts
+            if ($post.find('.gct-event-date, .gct-event-location').length > 0) {
+                // Apply specific styles for event posts
+                $post.find('.gct-event-date, .gct-event-location').css({
+                    'font-size': '14px',
+                    'color': '#666',
+                    'margin-bottom': '8px',
+                    'line-height': '1.4',
+                    'margin-top': '5px'
+                });
+                
+                $post.find('.gct-event-label').css({
+                    'font-weight': '600',
+                    'color': '#254B45'
+                });
+            }
+            
+            // Common styles for all posts
+            $post.find('.gct-post-title a').css({
+                'color': '#254B45',
+                'text-decoration': 'none',
+                'transition': 'color 0.3s ease'
+            });
+            
+            $post.find('.gct-post-excerpt').css({
+                'font-size': '14px',
+                'line-height': '1.5',
+                'color': '#666',
+                'margin-top': 'auto'
+            });
         });
     }
     

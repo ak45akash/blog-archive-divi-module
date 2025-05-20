@@ -330,16 +330,32 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             return '';
         }
         
-        // Only if there are more pages to load
-        if ($current_page < $total_pages) {
-            $output = '<div class="gct-pagination">';
-            $output .= '<a href="#" class="gct-load-more" data-page="' . esc_attr($current_page + 1) . '">' . esc_html($load_more_text) . '</a>';
-            $output .= '</div>';
-            return $output;
+        $output = '<div class="gct-pagination">';
+        
+        if ($pagination_type === 'load_more') {
+            // Only show load more button if there are more pages
+            if ($current_page < $total_pages) {
+                $output .= '<a href="#" class="gct-load-more" data-page="' . esc_attr($current_page + 1) . '">' . esc_html($load_more_text) . '</a>';
+            }
+        } else if ($pagination_type === 'numbers') {
+            // Numbered pagination
+            for ($i = 1; $i <= $total_pages; $i++) {
+                $active_class = ($i === $current_page) ? ' active' : '';
+                $output .= '<a href="#" class="' . $active_class . '" data-page="' . esc_attr($i) . '">' . esc_html($i) . '</a>';
+            }
+        } else if ($pagination_type === 'prev_next') {
+            // Previous button
+            $prev_disabled = ($current_page <= 1) ? ' disabled' : '';
+            $output .= '<a href="#" class="gct-pagination-prev' . $prev_disabled . '" data-page="' . esc_attr(max(1, $current_page - 1)) . '">← ' . esc_html__('Previous', 'gct-blog-posts-module') . '</a>';
+            
+            // Next button
+            $next_disabled = ($current_page >= $total_pages) ? ' disabled' : '';
+            $output .= '<a href="#" class="gct-pagination-next' . $next_disabled . '" data-page="' . esc_attr(min($total_pages, $current_page + 1)) . '">' . esc_html__('Next', 'gct-blog-posts-module') . ' →</a>';
         }
         
-        // If we're on the last page, don't show pagination
-        return '';
+        $output .= '</div>';
+        
+        return $output;
     }
     
     /**
@@ -443,15 +459,23 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Category filter
         if ($show_category_filter) {
-            $output .= sprintf(
-                '<div class="gct-blog-posts-filter">
-                    <select class="gct-category-filter" data-post-type="%1$s">
-                        %2$s
-                    </select>
-                </div>',
-                esc_attr($post_type),
-                $this->generate_category_dropdown($post_type, $selected_category, $category_filter_label)
-            );
+            $output .= '<div class="gct-category-filter">';
+            $output .= '<label>' . esc_html($category_filter_label) . '</label>';
+            $output .= '<select class="gct-category-select" data-taxonomy="' . esc_attr($this->get_taxonomy_for_post_type($post_type)) . '">';
+            
+            // Get categories for this post type
+            $categories = $this->get_categories_for_post_type($post_type);
+            foreach ($categories as $value => $name) {
+                $output .= sprintf(
+                    '<option value="%1$s" %2$s>%3$s</option>',
+                    esc_attr($value),
+                    selected($selected_category, $value, false),
+                    esc_html($name)
+                );
+            }
+            
+            $output .= '</select>';
+            $output .= '</div>';
         }
         
         // Posts container for AJAX updates
@@ -781,6 +805,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Get parameters
         $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
         $category_id = isset($_POST['category_id']) ? sanitize_text_field($_POST['category_id']) : 'all';
+        $taxonomy = isset($_POST['taxonomy']) ? sanitize_text_field($_POST['taxonomy']) : $this->get_taxonomy_for_post_type($post_type);
         $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 6;
         $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
         $load_more = isset($_POST['load_more']) && $_POST['load_more'] === 'true';
@@ -789,6 +814,22 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         $module_settings = isset($_POST['module_settings']) ? $_POST['module_settings'] : '';
         if (is_string($module_settings)) {
             $module_settings = json_decode(stripslashes($module_settings), true);
+        }
+        
+        // Default values if module_settings is not an array or missing keys
+        if (!is_array($module_settings)) {
+            $module_settings = array();
+        }
+        
+        // Set default values if missing
+        if (!isset($module_settings['posts_per_row'])) {
+            $module_settings['posts_per_row'] = 3;
+        }
+        if (!isset($module_settings['show_pagination'])) {
+            $module_settings['show_pagination'] = true;
+        }
+        if (!isset($module_settings['load_more_text'])) {
+            $module_settings['load_more_text'] = 'See more';
         }
         
         // Set global variable for module settings to be used in render_post_item
@@ -805,7 +846,6 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         
         // Add taxonomy query if category is selected
         if ($category_id !== 'all') {
-            $taxonomy = $this->get_taxonomy_for_post_type($post_type);
             if ($taxonomy) {
                 $args['tax_query'] = array(
                     array(
@@ -845,7 +885,9 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         } else {
             // For regular filter, return the entire grid
             if ($query->have_posts()) {
-                echo '<div class="gct-blog-posts-grid posts-per-row-' . esc_attr($module_settings['posts_per_row']) . '">';
+                // Use the default grid layout from the settings
+                // Don't explicitly set posts-per-row as JavaScript will handle this
+                echo '<div class="gct-blog-posts-grid">';
                 while ($query->have_posts()) {
                     $query->the_post();
                     $this->render_post_item();
@@ -858,8 +900,10 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             
             // Generate pagination
             $pagination_html = '';
-            if ($module_settings['show_pagination']) {
-                $pagination_html = $this->generate_pagination($total_pages, $page, 'load_more', $module_settings['load_more_text']);
+            if (isset($module_settings['show_pagination']) && $module_settings['show_pagination']) {
+                $load_more_text = isset($module_settings['load_more_text']) ? $module_settings['load_more_text'] : 'See more';
+                $pagination_type = isset($module_settings['pagination_type']) ? $module_settings['pagination_type'] : 'load_more';
+                $pagination_html = $this->generate_pagination($total_pages, $page, $pagination_type, $load_more_text);
             }
             
             $html = ob_get_clean();
@@ -899,7 +943,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
         // Flag to check if post is in Event category
         $is_event_category = false;
         
-        // Start post item
+        // Start post item with consistent classes
         echo '<article class="gct-post-item">';
         
         // Post thumbnail with overlay
@@ -912,7 +956,7 @@ class GCT_BlogPostsModule extends ET_Builder_Module {
             $thumbnail_style
         );
         
-        // Post content
+        // Post content with flex styling
         echo '<div class="gct-post-content">';
         
         // Get post type and determine if we should show category
